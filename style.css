@@ -1,0 +1,367 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --font: 'Press Start 2P', monospace;
+  --bg: #0a0a14;
+  --panel: #0f0f1e;
+  --border: #2a1a4a;
+  --neon-blue: #00e5ff;
+  --neon-pink: #ff2d7b;
+  --neon-green: #39ff14;
+  --neon-yellow: #ffe600;
+  --neon-orange: #ff8c00;
+  --dim: #5a5a7a;
+  --text: #c0c0d0;
+  --text-bright: #e0e0f0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.8;
+  image-rendering: pixelated;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--neon-blue);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--neon-pink);
+}
+
+/* ===== LAYOUT ===== */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(10, 10, 20, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+}
+
+nav .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  font-size: 10px;
+  color: var(--neon-green);
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+  letter-spacing: 2px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 8px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--neon-blue);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  position: relative;
+}
+
+.hero-greeting {
+  font-size: 10px;
+  color: var(--neon-blue);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-size: 36px;
+  color: var(--neon-green);
+  text-shadow: 0 0 30px rgba(57, 255, 20, 0.4), 0 0 60px rgba(57, 255, 20, 0.15);
+  letter-spacing: 3px;
+  margin-bottom: 24px;
+}
+
+.hero-tagline {
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  max-width: 500px;
+  line-height: 2;
+}
+
+.hero-cta {
+  margin-top: 40px;
+  display: inline-block;
+  border: 2px solid var(--neon-green);
+  color: var(--neon-green);
+  padding: 14px 36px;
+  font-family: var(--font);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.15);
+  transition: all 0.2s;
+  cursor: pointer;
+  background: transparent;
+}
+
+.hero-cta:hover {
+  background: rgba(57, 255, 20, 0.08);
+  box-shadow: 0 0 25px rgba(57, 255, 20, 0.3);
+  color: var(--neon-green);
+}
+
+/* Scanline overlay on hero */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.06) 2px,
+    rgba(0, 0, 0, 0.06) 4px
+  );
+  z-index: 1;
+}
+
+.hero > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== SECTION ===== */
+section {
+  padding: 80px 0;
+}
+
+.section-label {
+  font-size: 8px;
+  color: var(--neon-blue);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+  margin-bottom: 32px;
+}
+
+/* ===== CREATIONS GRID ===== */
+.creations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.creation-card {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.creation-card:hover {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.15);
+  transform: translateY(-2px);
+}
+
+.card-preview {
+  background: var(--bg);
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  border-bottom: 1px solid var(--border);
+  min-height: 160px;
+}
+
+.card-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-size: 11px;
+  color: var(--text-bright);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.card-desc {
+  font-size: 8px;
+  color: var(--dim);
+  line-height: 2;
+  flex: 1;
+}
+
+.card-tags {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.card-link {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 8px;
+  color: var(--neon-green);
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(57, 255, 20, 0.3);
+  transition: text-shadow 0.2s;
+}
+
+.card-link:hover {
+  text-shadow: 0 0 12px rgba(57, 255, 20, 0.6);
+  color: var(--neon-green);
+}
+
+/* ===== ABOUT ===== */
+.about-content {
+  max-width: 600px;
+}
+
+.about-content p {
+  font-size: 9px;
+  color: var(--text);
+  line-height: 2.2;
+  margin-bottom: 16px;
+}
+
+.about-content .highlight {
+  color: var(--neon-yellow);
+  text-shadow: 0 0 6px rgba(255, 230, 0, 0.3);
+}
+
+/* ===== FOOTER ===== */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 0;
+  text-align: center;
+}
+
+.footer-privacy {
+  font-size: 7px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  line-height: 2;
+}
+
+.footer-privacy .accent {
+  color: var(--neon-pink);
+  text-shadow: 0 0 6px rgba(255, 45, 123, 0.3);
+}
+
+.footer-copy {
+  font-size: 6px;
+  color: var(--border);
+  margin-top: 16px;
+  letter-spacing: 1px;
+}
+
+/* ===== COMING SOON CARD ===== */
+.creation-card.coming-soon {
+  border-style: dashed;
+  opacity: 0.5;
+}
+
+.creation-card.coming-soon .card-preview {
+  opacity: 0.4;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .hero h1 {
+    font-size: 22px;
+  }
+
+  .hero-greeting {
+    font-size: 8px;
+  }
+
+  .hero-tagline {
+    font-size: 8px;
+  }
+
+  .nav-links {
+    gap: 14px;
+  }
+
+  .nav-links a {
+    font-size: 7px;
+  }
+
+  .nav-logo {
+    font-size: 8px;
+  }
+
+  section {
+    padding: 60px 0;
+  }
+
+  .creations-grid {
+    grid-template-columns: 1fr;
+  }
+}
