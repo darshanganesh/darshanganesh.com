@@ -140,6 +140,15 @@
   .stat-num{font-size:20px;color:var(--neon-yellow);text-shadow:0 0 10px rgba(255,230,0,0.5)}
   .stat-lbl{font-size:6px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
 
+  /* ---- TUTORIAL ---- */
+  #tut-msg{font-size:9px;color:var(--text);line-height:2.2;letter-spacing:1px}
+  #tut-msg .hl{color:var(--neon-yellow);text-shadow:0 0 6px rgba(255,230,0,0.3)}
+  #tut-msg .hlg{color:var(--neon-green);text-shadow:0 0 6px rgba(57,255,20,0.3)}
+  #tut-msg .hlp{color:var(--neon-pink);text-shadow:0 0 6px rgba(255,45,123,0.3)}
+  #tut-msg .hlb{color:var(--neon-blue);text-shadow:0 0 6px rgba(0,229,255,0.3)}
+  .tut-pulse{animation:tutPulse 1s ease-in-out infinite}
+  @keyframes tutPulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
   /* ---- RESPONSIVE ---- */
   @media(max-width:480px){
     .title{font-size:20px}
@@ -162,7 +171,8 @@
     <div class="subtitle" style="margin-top:12px" id="secret-tap">Try your luck</div>
   </div>
   <button class="btn" id="play-btn">PLAY</button>
-  <div style="margin-top:16px;text-align:center">
+  <button class="btn btn-small btn-blue" id="tutorial-btn" style="margin-top:8px">HOW TO PLAY</button>
+  <div style="margin-top:12px;text-align:center">
     <div class="best-label" id="title-best"></div>
   </div>
 </div>
@@ -230,6 +240,29 @@
   </div>
 </div>
 
+<!-- TUTORIAL SCREEN -->
+<div id="tutorial-screen" class="screen">
+  <div class="hud">
+    <div class="hud-left">
+      <button class="btn-small btn-dim" id="tut-exit-btn">EXIT</button>
+      <span class="subtitle" id="tut-step-label">1 / 7</span>
+    </div>
+  </div>
+  <div class="table" id="tut-table">
+    <div class="hand-area">
+      <span class="hand-label">// dealer</span><span class="hand-value" id="tut-dealer-value"></span>
+      <div class="cards" id="tut-dealer-cards"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="hand-area">
+      <span class="hand-label">// you</span><span class="hand-value" id="tut-player-value"></span>
+      <div class="cards" id="tut-player-cards"></div>
+    </div>
+  </div>
+  <div id="tut-msg" style="text-align:center;max-width:480px;margin:8px 0"></div>
+  <div class="actions" id="tut-actions"></div>
+</div>
+
 <script>
 (()=>{
   // ========== CONFIG ==========
@@ -259,6 +292,7 @@
     bet: $('bet-screen'),
     game: $('game-screen'),
     gameover: $('gameover-screen'),
+    tutorial: $('tutorial-screen'),
   };
 
   function showScreen(name) {
@@ -750,6 +784,141 @@
       else showBetScreen();
     }
   });
+
+  // ========== TUTORIAL ==========
+  const tutCards = {
+    dealerDown: {rank:'K',suit:'spades'},
+    dealerUp: {rank:'6',suit:'hearts'},
+    playerA: {rank:'8',suit:'clubs'},
+    playerB: {rank:'5',suit:'diamonds'},
+    hitCard: {rank:'6',suit:'spades'},
+    dealerHit: {rank:'3',suit:'diamonds'},
+    splitA: {rank:'9',suit:'hearts'},
+    splitB: {rank:'9',suit:'clubs'},
+    dblCard: {rank:'J',suit:'hearts'},
+  };
+  let tutStep = 0;
+
+  function tutRenderCards(dealerCards, playerCards, dealerHidden) {
+    const dc = $('tut-dealer-cards'); dc.innerHTML = '';
+    dealerCards.forEach((c,i) => dc.appendChild(renderCard(c, dealerHidden && i === 1)));
+    const dv = $('tut-dealer-value');
+    if (dealerHidden) { dv.textContent = '' + handValue([dealerCards[0]]); dv.className = 'hand-value'; }
+    else { const v = handValue(dealerCards); dv.textContent = '' + v; dv.className = isBust(dealerCards) ? 'hand-value bust' : 'hand-value'; }
+    const pc = $('tut-player-cards'); pc.innerHTML = '';
+    playerCards.forEach(c => pc.appendChild(renderCard(c)));
+    const pv = $('tut-player-value');
+    const val = handValue(playerCards);
+    pv.textContent = '' + val; pv.className = val > 21 ? 'hand-value bust' : 'hand-value';
+  }
+
+  function tutMsg(html) { $('tut-msg').innerHTML = html; }
+  function tutActions(btns) {
+    const area = $('tut-actions'); area.innerHTML = '';
+    btns.forEach(b => {
+      const el = document.createElement('button');
+      el.className = 'btn btn-small ' + (b.cls || '');
+      if (b.pulse) el.classList.add('tut-pulse');
+      el.textContent = b.label;
+      el.onclick = b.fn;
+      area.appendChild(el);
+    });
+  }
+
+  const tutSteps = [
+    // Step 1: Intro — goal
+    () => {
+      tutRenderCards([], [], false);
+      $('tut-dealer-cards').innerHTML = ''; $('tut-player-cards').innerHTML = '';
+      $('tut-dealer-value').textContent = ''; $('tut-player-value').textContent = '';
+      tutMsg(`The goal is simple: get a hand value <span class="hl">closer to 21</span> than the dealer — <span class="hlp">without going over</span>.`);
+      tutActions([{label:'NEXT', fn:tutNext}]);
+    },
+    // Step 2: Card values
+    () => {
+      const samples = [
+        {rank:'7',suit:'hearts'},{rank:'Q',suit:'spades'},{rank:'A',suit:'diamonds'}
+      ];
+      const pc = $('tut-player-cards'); pc.innerHTML = '';
+      samples.forEach(c => pc.appendChild(renderCard(c)));
+      $('tut-player-value').textContent = ''; $('tut-dealer-cards').innerHTML = ''; $('tut-dealer-value').textContent = '';
+      tutMsg(`<span class="hlb">Number cards</span> = face value. <span class="hlb">Face cards</span> (J, Q, K) = <span class="hl">10</span>. <span class="hlb">Aces</span> = <span class="hl">1 or 11</span> (whichever helps you).`);
+      tutActions([{label:'NEXT', fn:tutNext}]);
+    },
+    // Step 3: Deal — show a hand
+    () => {
+      tutRenderCards(
+        [tutCards.dealerUp, tutCards.dealerDown],
+        [tutCards.playerA, tutCards.playerB],
+        true
+      );
+      tutMsg(`Cards are dealt. You can see both your cards — <span class="hl">8 + 5 = 13</span>. The dealer shows one card face up (<span class="hl">6</span>), one face down.`);
+      tutActions([{label:'NEXT', fn:tutNext}]);
+    },
+    // Step 4: Hit
+    () => {
+      tutRenderCards(
+        [tutCards.dealerUp, tutCards.dealerDown],
+        [tutCards.playerA, tutCards.playerB],
+        true
+      );
+      tutMsg(`Your hand is <span class="hl">13</span> — pretty low. <span class="hlb">HIT</span> to draw another card. Try it!`);
+      tutActions([{label:'HIT', cls:'btn-blue', pulse:true, fn:tutNext}]);
+    },
+    // Step 5: After hit — stand
+    () => {
+      tutRenderCards(
+        [tutCards.dealerUp, tutCards.dealerDown],
+        [tutCards.playerA, tutCards.playerB, tutCards.hitCard],
+        true
+      );
+      tutMsg(`You drew a <span class="hl">6</span> — now you have <span class="hlg">19</span>. That's strong! <span class="hlg">STAND</span> to keep your hand and let the dealer play.`);
+      tutActions([{label:'STAND', pulse:true, fn:tutNext}]);
+    },
+    // Step 6: Dealer plays
+    () => {
+      tutRenderCards(
+        [tutCards.dealerUp, tutCards.dealerDown, tutCards.dealerHit],
+        [tutCards.playerA, tutCards.playerB, tutCards.hitCard],
+        false
+      );
+      tutMsg(`The dealer flips their hidden card — <span class="hl">K</span> for <span class="hl">16</span>. Dealers <span class="hlp">must hit until 17+</span>. They draw a <span class="hl">3</span> = <span class="hl">19</span>. It's a <span class="hl">push</span> (tie) — your bet is returned!`);
+      tutActions([{label:'NEXT', fn:tutNext}]);
+    },
+    // Step 7: Advanced moves + done
+    () => {
+      $('tut-dealer-cards').innerHTML = ''; $('tut-player-cards').innerHTML = '';
+      $('tut-dealer-value').textContent = ''; $('tut-player-value').textContent = '';
+      const pc = $('tut-player-cards');
+      pc.appendChild(renderCard(tutCards.splitA));
+      pc.appendChild(renderCard(tutCards.splitB));
+      $('tut-player-value').textContent = '18';
+      tutMsg(
+        `Two more moves:<br><br>` +
+        `<span class="hlp">DOUBLE DOWN</span> — double your bet, get exactly <span class="hl">one</span> more card. High risk, high reward.<br><br>` +
+        `<span class="hl">SPLIT</span> — if you have two cards with the <span class="hl">same value</span> (like these 9s), split into two separate hands.<br><br>` +
+        `That's it — you're ready!`
+      );
+      tutActions([{label:'LET\'S PLAY', cls:'', pulse:true, fn:() => {
+        if (bankroll <= 0) { bankroll = START_BANK; saveState(); }
+        showBetScreen();
+      }}]);
+    },
+  ];
+
+  function tutNext() { tutStep++; if (tutStep < tutSteps.length) runTutStep(); }
+  function runTutStep() {
+    $('tut-step-label').textContent = (tutStep + 1) + ' / ' + tutSteps.length;
+    tutSteps[tutStep]();
+  }
+  function startTutorial() {
+    tutStep = 0;
+    showScreen('tutorial');
+    runTutStep();
+  }
+
+  $('tutorial-btn').addEventListener('click', startTutorial);
+  $('tut-exit-btn').addEventListener('click', () => showScreen('title'));
 
   // ========== SECRET ==========
   let secretTaps = 0, secretTimer = null;
