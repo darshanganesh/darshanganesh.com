@@ -1,0 +1,13 @@
+# Darshan's Website
+
+> Personal site by Darshan, a middle school developer. Features browser-based games built from scratch with HTML, CSS, and JavaScript.
+
+## Pages
+
+- [Homepage](https://darshanganesh.com/): Portfolio landing page showcasing Darshan's projects and games.
+- [Snake Arcade](https://darshanganesh.com/games/snake-game/): A retro arcade snake game with 4 playable animals, 4 food types, and 10 game modes including blind, mirror, maze, speed, and time attack. Built with HTML Canvas.
+- [Blackjack](https://darshanganesh.com/games/blackjack/): Classic single-player blackjack card game. Hit, stand, double down, or split. Features chip betting, bankroll tracking, and an interactive tutorial for new players.
+
+## About
+
+All games are self-contained single-page HTML files with no external dependencies (besides Google Fonts). No tracking, no cookies, no analytics.
