@@ -159,7 +159,7 @@
 <div id="title-screen" class="screen active">
   <div style="padding:30px 0;text-align:center">
     <div class="title">BLACKJACK</div>
-    <div class="subtitle" style="margin-top:12px">Try your luck</div>
+    <div class="subtitle" style="margin-top:12px" id="secret-tap">Try your luck</div>
   </div>
   <button class="btn" id="play-btn">PLAY</button>
   <div style="margin-top:16px;text-align:center">
@@ -748,6 +748,30 @@
       e.preventDefault();
       if (bankroll <= 0) showGameOver();
       else showBetScreen();
+    }
+  });
+
+  // ========== SECRET ==========
+  let secretTaps = 0, secretTimer = null;
+  $('secret-tap').addEventListener('click', () => {
+    secretTaps++;
+    clearTimeout(secretTimer);
+    secretTimer = setTimeout(() => secretTaps = 0, 1500);
+    if (secretTaps >= 5) {
+      secretTaps = 0;
+      bankroll += 500;
+      if (bankroll > bestBankroll) bestBankroll = bankroll;
+      saveState();
+      updateBankrollDisplays();
+      const el = $('secret-tap');
+      el.style.color = 'var(--neon-green)';
+      el.style.textShadow = '0 0 12px rgba(57,255,20,0.6)';
+      el.textContent = '+$500';
+      setTimeout(() => {
+        el.style.color = '';
+        el.style.textShadow = '';
+        el.textContent = 'Try your luck';
+      }, 800);
     }
   });
 
