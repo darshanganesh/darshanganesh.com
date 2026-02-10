@@ -1,6 +1,6 @@
 # Darshan's Website
 
-> Personal site by Darshan, a middle school developer. Features browser-based games built from scratch with HTML, CSS, and JavaScript.
+> Personal site by Darshan, a developer. Features browser-based games built from scratch with HTML, CSS, and JavaScript.
 
 ## Pages
 
