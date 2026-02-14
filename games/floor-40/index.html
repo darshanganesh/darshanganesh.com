@@ -199,7 +199,7 @@
 <div id="rules-screen" class="screen">
   <h2>// FLOOR 40 PROTOCOL</h2>
   <ul class="rules-list" id="rules-list"></ul>
-  <button class="btn btn-sm" id="rules-continue" onclick="startGame()">UNDERSTOOD</button>
+  <button class="btn btn-sm" id="rules-continue" onclick="try{startGame()}catch(e){alert('ERROR: '+e.message+' at '+e.stack.split('\n')[1])}">UNDERSTOOD</button>
 </div>
 
 <!-- GAME -->
