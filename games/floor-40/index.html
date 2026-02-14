@@ -191,7 +191,7 @@
     Learn them. Follow them.<br><br>
     Or don't.</p>
   </div>
-  <button class="btn" id="play-btn" onclick="window._playClick&&window._playClick()">ENTER</button>
+  <button class="btn" id="play-btn" onclick="document.getElementById('menu-screen').classList.remove('active');document.getElementById('rules-screen').classList.add('active');if(window._playClick)window._playClick();">ENTER</button>
   <p style="margin-top:12px;font-size:6px">WASD to move &bull; E to interact &bull; C to close eyes &bull; SHIFT to sprint</p>
 </div>
 
@@ -199,7 +199,7 @@
 <div id="rules-screen" class="screen">
   <h2>// FLOOR 40 PROTOCOL</h2>
   <ul class="rules-list" id="rules-list"></ul>
-  <button class="btn btn-sm" id="rules-continue">UNDERSTOOD</button>
+  <button class="btn btn-sm" id="rules-continue" onclick="if(window._startGame)window._startGame();">UNDERSTOOD</button>
 </div>
 
 <!-- GAME -->
@@ -1847,6 +1847,7 @@ function onPlayClick(){
 }
 window._playClick=onPlayClick;
 $('play-btn').addEventListener('click',onPlayClick);
+window._startGame=startGame;
 $('rules-continue').addEventListener('click',startGame);
 $('retry-btn').addEventListener('click',()=>{
   state.version=1;
