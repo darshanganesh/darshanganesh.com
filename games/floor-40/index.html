@@ -193,6 +193,7 @@
   </div>
   <button class="btn" id="play-btn" onclick="initAudio();state.version=1;showRules()">ENTER</button>
   <p style="margin-top:12px;font-size:6px">WASD to move &bull; E to interact &bull; C to close eyes &bull; SHIFT to sprint</p>
+  <p style="font-size:5px;color:#333;margin-top:4px">build 8</p>
 </div>
 
 <!-- RULES -->
@@ -272,7 +273,8 @@
 </div>
 
 <script>
-try{
+window.onerror=function(msg,src,line){document.title='ERR:'+msg;document.getElementById('menu-screen').innerHTML='<pre style="color:red;padding:20px;font-size:10px">ERROR: '+msg+'\nLine: '+line+'</pre>'+document.getElementById('menu-screen').innerHTML;};
+
 
 // ===== CONSTANTS =====
 var T={FLOOR:0,WALL:1,DESK:2,DOOR:3,WINDOW:4,ELEVATOR:5,SODA:6,CLEAN:7};
@@ -1847,7 +1849,6 @@ window.addEventListener('resize',()=>{
 resizeCanvas();
 requestAnimationFrame(loop);
 
-}catch(e){document.body.innerHTML='<pre style="color:red;padding:20px">JS ERROR: '+e.message+'\n'+e.stack+'</pre>';}
 </script>
 </body>
 </html>
