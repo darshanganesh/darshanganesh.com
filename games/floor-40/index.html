@@ -17,7 +17,7 @@
   body{
     background:var(--bg);display:flex;justify-content:center;align-items:center;
     min-height:100vh;font-family:var(--font);color:#c0c0d0;
-    user-select:none;overflow:hidden;image-rendering:pixelated;
+    user-select:none;overflow-y:auto;overflow-x:hidden;image-rendering:pixelated;
   }
 
   /* SCREENS */
@@ -48,6 +48,7 @@
 
   /* GAME SCREEN */
   #game-screen{padding:0;gap:0;max-width:none}
+  body.playing{overflow:hidden}
   #hud{
     display:flex;justify-content:space-between;align-items:center;
     width:100%;padding:6px 12px;background:rgba(10,10,20,0.95);
@@ -1186,6 +1187,7 @@ function gameOver(reason){
   triggerRedFlash(1);
   $('death-reason').textContent=reason;
   stopAmbience();
+  document.body.classList.remove('playing');
   setTimeout(()=>showScreen('gameover-screen'),800);
 }
 
@@ -1198,6 +1200,7 @@ function winGame(){
   const secs=Math.floor(state.gameTime%60);
   $('win-stats').textContent='Time: '+mins+'m '+secs+'s | Candy used: '+(state.deathCount>0?state.deathCount+' lost':'none lost');
   stopAmbience();
+  document.body.classList.remove('playing');
   setTimeout(()=>showScreen('win-screen'),500);
 }
 
@@ -1799,6 +1802,7 @@ function startGame(){
 
   resizeCanvas();
   showScreen('game-screen');
+  document.body.classList.add('playing');
   startAmbience();
 }
 
@@ -1845,12 +1849,13 @@ $('retry-btn').addEventListener('click',()=>{
   state.version=1;
   showRules();
 });
-$('menu-btn').addEventListener('click',()=>{showScreen('menu-screen');state.screen='menu';});
-$('win-menu-btn').addEventListener('click',()=>{showScreen('menu-screen');state.screen='menu';});
+$('menu-btn').addEventListener('click',()=>{showScreen('menu-screen');state.screen='menu';document.body.classList.remove('playing')});
+$('win-menu-btn').addEventListener('click',()=>{showScreen('menu-screen');state.screen='menu';document.body.classList.remove('playing')});
 $('back-btn').addEventListener('click',()=>{
   stopAmbience();
   showScreen('menu-screen');
   state.screen='menu';
+  document.body.classList.remove('playing');
 });
 
 window.addEventListener('resize',()=>{
