@@ -191,7 +191,7 @@
     Learn them. Follow them.<br><br>
     Or don't.</p>
   </div>
-  <button class="btn" id="play-btn" style="position:relative;z-index:999" onclick="this.textContent='LOADING...';document.getElementById('menu-screen').classList.remove('active');document.getElementById('rules-screen').classList.add('active');if(window._playClick)window._playClick();">ENTER</button>
+  <button class="btn" id="play-btn" onclick="initAudio();state.version=1;showRules()">ENTER</button>
   <p style="margin-top:12px;font-size:6px">WASD to move &bull; E to interact &bull; C to close eyes &bull; SHIFT to sprint</p>
 </div>
 
@@ -199,14 +199,14 @@
 <div id="rules-screen" class="screen">
   <h2>// FLOOR 40 PROTOCOL</h2>
   <ul class="rules-list" id="rules-list"></ul>
-  <button class="btn btn-sm" id="rules-continue" onclick="if(window._startGame)window._startGame();">UNDERSTOOD</button>
+  <button class="btn btn-sm" id="rules-continue" onclick="startGame()">UNDERSTOOD</button>
 </div>
 
 <!-- GAME -->
 <div id="game-screen" class="screen">
   <div id="hud">
     <div id="hud-left">
-      <button id="back-btn">&#9664; MENU</button>
+      <button id="back-btn" onclick="stopAmbience();showScreen('menu-screen');state.screen='menu';document.body.classList.remove('playing')">&#9664; MENU</button>
       <span class="hud-item hud-candy" id="hud-candy">CANDY: 0</span>
       <span class="hud-item hud-clean" id="hud-clean">CLEAN: 0/5</span>
     </div>
@@ -259,8 +259,8 @@
 <div id="gameover-screen" class="screen">
   <h1>TERMINATED</h1>
   <p class="death-reason" id="death-reason"></p>
-  <button class="btn" id="retry-btn">TRY AGAIN</button>
-  <button class="btn btn-sm btn-blue" id="menu-btn" style="margin-top:8px">MENU</button>
+  <button class="btn" id="retry-btn" onclick="state.version=1;showRules()">TRY AGAIN</button>
+  <button class="btn btn-sm btn-blue" id="menu-btn" style="margin-top:8px" onclick="showScreen('menu-screen');state.screen='menu';document.body.classList.remove('playing')">MENU</button>
 </div>
 
 <!-- WIN -->
@@ -268,23 +268,21 @@
   <h1 style="color:var(--neon-green)">SURVIVED</h1>
   <p>You cleaned Floor 40.<br>You followed the rules.<br>You made it to the elevator.</p>
   <p style="color:var(--dim);font-size:6px;margin-top:8px" id="win-stats"></p>
-  <button class="btn btn-green" id="win-menu-btn">MENU</button>
+  <button class="btn btn-green" id="win-menu-btn" onclick="showScreen('menu-screen');state.screen='menu';document.body.classList.remove('playing')">MENU</button>
 </div>
 
 <script>
-(()=>{
-'use strict';
 try{
 
 // ===== CONSTANTS =====
-const T={FLOOR:0,WALL:1,DESK:2,DOOR:3,WINDOW:4,ELEVATOR:5,SODA:6,CLEAN:7};
-const TILE=24;
-const MW=44,MH=28;
-const WALK_SPEED=3.2,SPRINT_SPEED=5.5;
-const CANDY_CHANCE=0.35;
+var T={FLOOR:0,WALL:1,DESK:2,DOOR:3,WINDOW:4,ELEVATOR:5,SODA:6,CLEAN:7};
+var TILE=24;
+var MW=44,MH=28;
+var WALK_SPEED=3.2,SPRINT_SPEED=5.5;
+var CANDY_CHANCE=0.35;
 
 // Colors
-const COL={
+var COL={
   floor:'#1a1a2e',floorAlt:'#1c1c30',wall:'#0d0d1a',wallTop:'#14142a',
   desk:'#2a1f14',deskTop:'#3a2f1f',door:'#2a2a3a',doorOpen:'#1a1a2e',
   window:'#0a1a3a',windowGlow:'rgba(0,100,200,0.15)',
@@ -295,15 +293,15 @@ const COL={
 };
 
 // ===== DOM =====
-const $=id=>document.getElementById(id);
-const canvas=$('game');
-const ctx=canvas.getContext('2d');
-const lightCanvas=$('light-canvas');
-const lightCtx=lightCanvas.getContext('2d');
-const wrap=$('canvas-wrap');
+var $=function(id){return document.getElementById(id)};
+var canvas=$('game');
+var ctx=canvas.getContext('2d');
+var lightCanvas=$('light-canvas');
+var lightCtx=lightCanvas.getContext('2d');
+var wrap=$('canvas-wrap');
 
 // ===== SCREENS =====
-const screens=['menu-screen','rules-screen','game-screen','gameover-screen','win-screen'];
+var screens=['menu-screen','rules-screen','game-screen','gameover-screen','win-screen'];
 function showScreen(id){
   screens.forEach(s=>{
     const el=$(s);
@@ -534,7 +532,7 @@ function isWalkable(tx,ty){
 }
 
 // ===== GAME STATE =====
-const state={
+var state={
   screen:'menu',
   version:1,
   candy:0,
@@ -561,7 +559,7 @@ const state={
 };
 
 // ===== PLAYER =====
-const player={
+var player={
   x:0,y:0,
   dir:2,// 0=up,1=right,2=down,3=left
   speed:WALK_SPEED,
@@ -579,7 +577,7 @@ function resetPlayer(){
 }
 
 // ===== INPUT =====
-const keys={};
+var keys={};
 let touchDirs={up:false,down:false,left:false,right:false};
 let touchInteract=false;
 let touchEyes=false;
@@ -647,7 +645,7 @@ function updateEffects(dt){
 // ===== ENTITIES =====
 
 // Entity 1 - The Collector
-const collector={
+var collector={
   active:false,
   x:0,y:0,
   spawnTimer:35,
@@ -706,7 +704,7 @@ function updateCollector(dt){
 }
 
 // Entity 2 - Dark Desk Man
-const deskManTips=[
+var deskManTips=[
   'The one in the suit wants candy.\nAlways carry candy.',
   'Do not enter the room with the\nred floor. He only warns once.',
   'When the lights flicker, close\nyour eyes. Hold C and count.',
@@ -714,7 +712,7 @@ const deskManTips=[
   'The floor remembers every\nvibration. Walk slowly.',
   'Some doors bang. Never open\na door that is banging.',
 ];
-const deskManV2Lines=[
+var deskManV2Lines=[
   'The rules have changed.\nNothing is the same. Be careful.',
   'I can\'t stay any longer.\nGoodbye, janitor.',
 ];
@@ -789,7 +787,7 @@ function updateHoarder(){
 }
 
 // Entity 4 - Tall Man
-const tallMan={
+var tallMan={
   active:false,
   x:0,y:0,
   speed:2.5,
@@ -842,7 +840,7 @@ function updateTallMan(dt){
 }
 
 // Entity 5 - The Blinker
-const blinker={
+var blinker={
   phase:'idle',// idle, warning, active, safe
   timer:0,
   spawnTimer:45,
@@ -916,7 +914,7 @@ function updateBlinker(dt){
 }
 
 // Entity 6 - The Knocker
-const knocker={
+var knocker={
   activeDoor:null,
   timer:0,
   spawnTimer:30,
@@ -955,7 +953,7 @@ function updateKnocker(dt){
 }
 
 // Entity 7 - The Mirror
-const mirror={
+var mirror={
   stareTimer:0,
   active:false,
   reflX:0,reflY:0,
@@ -1839,28 +1837,7 @@ function loop(ts){
   requestAnimationFrame(loop);
 }
 
-// ===== BUTTON WIRING =====
-function onPlayClick(){
-  initAudio();
-  state.version=1;
-  showRules();
-}
-window._playClick=onPlayClick;
-$('play-btn').addEventListener('click',onPlayClick);
-window._startGame=startGame;
-$('rules-continue').addEventListener('click',startGame);
-$('retry-btn').addEventListener('click',()=>{
-  state.version=1;
-  showRules();
-});
-$('menu-btn').addEventListener('click',()=>{showScreen('menu-screen');state.screen='menu';document.body.classList.remove('playing')});
-$('win-menu-btn').addEventListener('click',()=>{showScreen('menu-screen');state.screen='menu';document.body.classList.remove('playing')});
-$('back-btn').addEventListener('click',()=>{
-  stopAmbience();
-  showScreen('menu-screen');
-  state.screen='menu';
-  document.body.classList.remove('playing');
-});
+// Button wiring handled via inline onclick attributes
 
 window.addEventListener('resize',()=>{
   if(state.screen==='playing')resizeCanvas();
@@ -1871,7 +1848,6 @@ resizeCanvas();
 requestAnimationFrame(loop);
 
 }catch(e){document.body.innerHTML='<pre style="color:red;padding:20px">JS ERROR: '+e.message+'\n'+e.stack+'</pre>';}
-})();
 </script>
 </body>
 </html>
