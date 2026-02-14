@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>FLOOR 40</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --font:'Press Start 2P',monospace;
+    --bg:#0a0a14;--panel:#0f0f1e;--border:#2a1a4a;
+    --neon-blue:#00e5ff;--neon-pink:#ff2d7b;--neon-green:#39ff14;
+    --neon-yellow:#ffe600;--neon-orange:#ff8c00;--dim:#5a5a7a;
+    --neon-red:#ff1a1a;
+  }
+  body{
+    background:var(--bg);display:flex;justify-content:center;align-items:center;
+    min-height:100vh;font-family:var(--font);color:#c0c0d0;
+    user-select:none;overflow:hidden;image-rendering:pixelated;
+  }
+
+  /* SCREENS */
+  .screen{display:none;flex-direction:column;align-items:center;gap:16px;padding:24px;max-width:600px;width:100%;text-align:center}
+  .screen.active{display:flex}
+  .screen h1{font-size:24px;color:var(--neon-red);text-shadow:0 0 20px rgba(255,26,26,0.6),0 0 40px rgba(255,26,26,0.2);letter-spacing:3px}
+  .screen h2{font-size:14px;color:var(--neon-blue);text-shadow:0 0 10px rgba(0,229,255,0.4);letter-spacing:2px}
+  .screen p{font-size:8px;color:var(--dim);line-height:2.2;max-width:480px}
+  .screen .lore{color:#8a8a9a;font-size:7px;line-height:2.4;border:1px solid var(--border);padding:16px;border-radius:4px;background:var(--panel);margin:8px 0}
+
+  .btn{
+    background:transparent;border:2px solid var(--neon-red);color:var(--neon-red);
+    padding:12px 40px;font-family:var(--font);font-size:11px;cursor:pointer;
+    letter-spacing:3px;text-shadow:0 0 10px rgba(255,26,26,0.5);
+    box-shadow:0 0 15px rgba(255,26,26,0.2);transition:all 0.15s;border-radius:2px;
+  }
+  .btn:hover{background:rgba(255,26,26,0.1);box-shadow:0 0 25px rgba(255,26,26,0.4)}
+  .btn-sm{padding:8px 20px;font-size:8px;letter-spacing:2px}
+  .btn-green{border-color:var(--neon-green);color:var(--neon-green);text-shadow:0 0 10px rgba(57,255,20,0.5);box-shadow:0 0 15px rgba(57,255,20,0.2)}
+  .btn-green:hover{background:rgba(57,255,20,0.1);box-shadow:0 0 25px rgba(57,255,20,0.4)}
+  .btn-blue{border-color:var(--neon-blue);color:var(--neon-blue);text-shadow:0 0 10px rgba(0,229,255,0.5);box-shadow:0 0 15px rgba(0,229,255,0.2)}
+  .btn-blue:hover{background:rgba(0,229,255,0.1);box-shadow:0 0 25px rgba(0,229,255,0.4)}
+
+  .rules-list{text-align:left;font-size:7px;color:#aaa;line-height:2.6;list-style:none;padding:0}
+  .rules-list li{border-bottom:1px solid #1a1a2e;padding:6px 0}
+  .rules-list .rule-num{color:var(--neon-red);margin-right:8px}
+  .rules-list .unknown{color:var(--dim);font-style:italic}
+
+  /* GAME SCREEN */
+  #game-screen{padding:0;gap:0;max-width:none}
+  #hud{
+    display:flex;justify-content:space-between;align-items:center;
+    width:100%;padding:6px 12px;background:rgba(10,10,20,0.95);
+    border-bottom:1px solid var(--border);z-index:10;
+  }
+  #hud-left,#hud-right{display:flex;gap:12px;align-items:center}
+  .hud-item{font-size:7px;letter-spacing:1px}
+  .hud-candy{color:var(--neon-yellow)}
+  .hud-clean{color:var(--neon-green)}
+  .hud-version{color:var(--neon-red);font-size:6px;border:1px solid var(--neon-red);padding:2px 6px;border-radius:2px}
+  .hud-battery{color:var(--neon-blue)}
+  #back-btn{
+    background:transparent;border:1px solid var(--border);color:var(--dim);
+    padding:3px 8px;border-radius:2px;font-family:var(--font);font-size:6px;
+    cursor:pointer;transition:all 0.15s;letter-spacing:1px;
+  }
+  #back-btn:hover{border-color:var(--neon-pink);color:var(--neon-pink)}
+
+  .canvas-wrap{position:relative;display:inline-block;overflow:hidden}
+  canvas{display:block}
+  .scanlines{
+    position:absolute;inset:0;pointer-events:none;z-index:2;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);
+  }
+  .vignette{
+    position:absolute;inset:0;pointer-events:none;z-index:3;
+    background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.6) 100%);
+  }
+
+  /* MESSAGE OVERLAY */
+  #msg-overlay{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    pointer-events:none;z-index:5;
+  }
+  #msg-text{
+    font-family:var(--font);font-size:9px;color:var(--neon-red);
+    text-shadow:0 0 15px rgba(255,26,26,0.8);letter-spacing:2px;
+    text-align:center;line-height:2;padding:20px;
+    opacity:0;transition:opacity 0.5s;
+  }
+  #msg-text.show{opacity:1}
+
+  /* CLOSE EYES OVERLAY */
+  #eyes-overlay{
+    position:absolute;inset:0;background:#000;z-index:6;
+    display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+  }
+  #eyes-overlay.active{display:flex}
+  #eyes-timer{font-family:var(--font);font-size:28px;color:var(--neon-blue);text-shadow:0 0 20px rgba(0,229,255,0.6)}
+  #eyes-label{font-family:var(--font);font-size:8px;color:var(--dim);letter-spacing:3px}
+
+  /* VIBRATION METER */
+  #vib-bar{
+    position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+    width:200px;height:6px;background:#1a1a2e;border:1px solid var(--border);
+    border-radius:3px;z-index:5;overflow:hidden;opacity:0;transition:opacity 0.3s;
+  }
+  #vib-bar.show{opacity:1}
+  #vib-fill{height:100%;width:0%;background:var(--neon-red);transition:width 0.1s;border-radius:3px}
+
+  /* DIALOGUE BOX */
+  #dialogue{
+    position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+    background:rgba(15,15,30,0.95);border:1px solid var(--neon-green);
+    padding:12px 16px;border-radius:4px;max-width:400px;z-index:5;
+    display:none;
+  }
+  #dialogue.show{display:block}
+  #dialogue-name{font-family:var(--font);font-size:7px;color:var(--neon-green);letter-spacing:2px;margin-bottom:8px}
+  #dialogue-text{font-family:var(--font);font-size:7px;color:#c0c0d0;line-height:2}
+  #dialogue-hint{font-family:var(--font);font-size:6px;color:var(--dim);margin-top:8px;letter-spacing:1px}
+
+  /* TRANSITION SCREEN */
+  #transition{
+    position:absolute;inset:0;background:#000;z-index:10;
+    display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  }
+  #transition.active{display:flex}
+  #transition p{font-family:var(--font);font-size:8px;letter-spacing:2px;line-height:2;opacity:0;transition:opacity 1s}
+  #transition .t-warn{color:var(--neon-red)}
+  #transition .t-info{color:var(--dim)}
+  #transition .t-ver{color:var(--neon-yellow);font-size:12px}
+
+  /* TOUCH CONTROLS */
+  #touch-controls{
+    position:absolute;bottom:20px;left:0;right:0;z-index:8;
+    display:none;justify-content:space-between;padding:0 20px;
+  }
+  .touch-dpad{display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:2px}
+  .touch-btn{
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+    border-radius:6px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--font);font-size:10px;color:rgba(255,255,255,0.4);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .touch-btn:active{background:rgba(255,255,255,0.2)}
+  .touch-btn.blank{background:transparent;border:none}
+  .touch-actions{display:flex;gap:8px;align-items:flex-end}
+  .touch-action{
+    width:52px;height:52px;border-radius:50%;
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font);font-size:6px;color:rgba(255,255,255,0.4);
+    letter-spacing:1px;
+  }
+  .touch-action:active{background:rgba(255,255,255,0.2)}
+
+  /* GAME OVER / WIN SPECIAL */
+  #gameover-screen .death-reason{color:var(--neon-red);font-size:8px;line-height:2;margin:8px 0;text-shadow:0 0 10px rgba(255,26,26,0.4)}
+  #win-screen h1{color:var(--neon-green);text-shadow:0 0 20px rgba(57,255,20,0.6)}
+
+  /* TUTORIAL */
+  #tutorial{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    z-index:7;text-align:center;pointer-events:none;transition:opacity 1s;
+  }
+  #tutorial p{font-family:var(--font);font-size:7px;color:var(--dim);line-height:3;letter-spacing:1px}
+  #tutorial .key{color:var(--neon-blue)}
+
+  @media(max-width:600px){
+    .screen h1{font-size:18px}
+    .screen p{font-size:7px}
+    #touch-controls{display:flex}
+  }
+  @media(pointer:coarse){
+    #touch-controls{display:flex}
+  }
+</style>
+</head>
+<body>
+
+<!-- MENU -->
+<div id="menu-screen" class="screen active">
+  <h1>FLOOR 40</h1>
+  <div class="lore">
+    <p>You are a night janitor at Meridian Corp.<br>
+    Your job is simple: clean Floor 40.<br><br>
+    The building is not empty.<br>
+    Each entity has rules.<br>
+    Learn them. Follow them.<br><br>
+    Or don't.</p>
+  </div>
+  <button class="btn" id="play-btn">ENTER</button>
+  <p style="margin-top:12px;font-size:6px">WASD to move &bull; E to interact &bull; C to close eyes &bull; SHIFT to sprint</p>
+</div>
+
+<!-- RULES -->
+<div id="rules-screen" class="screen">
+  <h2>// FLOOR 40 PROTOCOL</h2>
+  <ul class="rules-list" id="rules-list"></ul>
+  <button class="btn btn-sm" id="rules-continue">UNDERSTOOD</button>
+</div>
+
+<!-- GAME -->
+<div id="game-screen" class="screen">
+  <div id="hud">
+    <div id="hud-left">
+      <button id="back-btn">&#9664; MENU</button>
+      <span class="hud-item hud-candy" id="hud-candy">CANDY: 0</span>
+      <span class="hud-item hud-clean" id="hud-clean">CLEAN: 0/5</span>
+    </div>
+    <div id="hud-right">
+      <span class="hud-item hud-battery" id="hud-battery">LIGHT: 100%</span>
+      <span class="hud-item hud-version" id="hud-version">V1</span>
+    </div>
+  </div>
+  <div class="canvas-wrap" id="canvas-wrap">
+    <canvas id="game"></canvas>
+    <canvas id="light-canvas" style="position:absolute;inset:0;z-index:1;pointer-events:none"></canvas>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+    <div id="msg-overlay"><div id="msg-text"></div></div>
+    <div id="eyes-overlay"><div id="eyes-timer">3</div><div id="eyes-label">KEEP EYES CLOSED (HOLD C)</div></div>
+    <div id="vib-bar"><div id="vib-fill"></div></div>
+    <div id="dialogue"><div id="dialogue-name"></div><div id="dialogue-text"></div><div id="dialogue-hint">Press E to dismiss</div></div>
+    <div id="transition">
+      <p class="t-info" id="t-line1">CLEANING PROTOCOL COMPLETE</p>
+      <p class="t-ver" id="t-line2">VERSION 2</p>
+      <p class="t-warn" id="t-line3">WARNING: PARAMETERS MODIFIED</p>
+    </div>
+    <div id="tutorial">
+      <p><span class="key">WASD</span> Move</p>
+      <p><span class="key">E</span> Interact with desks &amp; doors</p>
+      <p><span class="key">C</span> Close your eyes</p>
+      <p><span class="key">SHIFT</span> Sprint (careful...)</p>
+    </div>
+    <div id="touch-controls">
+      <div class="touch-dpad">
+        <div class="touch-btn blank"></div>
+        <div class="touch-btn" data-dir="up">&#9650;</div>
+        <div class="touch-btn blank"></div>
+        <div class="touch-btn" data-dir="left">&#9664;</div>
+        <div class="touch-btn blank"></div>
+        <div class="touch-btn" data-dir="right">&#9654;</div>
+        <div class="touch-btn blank"></div>
+        <div class="touch-btn" data-dir="down">&#9660;</div>
+        <div class="touch-btn blank"></div>
+      </div>
+      <div class="touch-actions">
+        <div class="touch-action" id="touch-eyes">C</div>
+        <div class="touch-action" id="touch-interact">E</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover-screen" class="screen">
+  <h1>TERMINATED</h1>
+  <p class="death-reason" id="death-reason"></p>
+  <button class="btn" id="retry-btn">TRY AGAIN</button>
+  <button class="btn btn-sm btn-blue" id="menu-btn" style="margin-top:8px">MENU</button>
+</div>
+
+<!-- WIN -->
+<div id="win-screen" class="screen">
+  <h1 style="color:var(--neon-green)">SURVIVED</h1>
+  <p>You cleaned Floor 40.<br>You followed the rules.<br>You made it to the elevator.</p>
+  <p style="color:var(--dim);font-size:6px;margin-top:8px" id="win-stats"></p>
+  <button class="btn btn-green" id="win-menu-btn">MENU</button>
+</div>
+
+<script>
+(()=>{
+'use strict';
+
+// ===== CONSTANTS =====
+const T={FLOOR:0,WALL:1,DESK:2,DOOR:3,WINDOW:4,ELEVATOR:5,SODA:6,CLEAN:7};
+const TILE=24;
+const MW=44,MH=28;
+const WALK_SPEED=3.2,SPRINT_SPEED=5.5;
+const CANDY_CHANCE=0.35;
+
+// Colors
+const COL={
+  floor:'#1a1a2e',floorAlt:'#1c1c30',wall:'#0d0d1a',wallTop:'#14142a',
+  desk:'#2a1f14',deskTop:'#3a2f1f',door:'#2a2a3a',doorOpen:'#1a1a2e',
+  window:'#0a1a3a',windowGlow:'rgba(0,100,200,0.15)',
+  elevator:'#2a2a3a',elevGlow:'#39ff14',
+  soda:'#3a1a1a',sodaCan:'#ff2d2d',
+  clean:'#2a2a1a',cleanGlow:'rgba(255,230,0,0.1)',
+  player:'#00e5ff',playerGlow:'rgba(0,229,255,0.4)',
+};
+
+// ===== DOM =====
+const $=id=>document.getElementById(id);
+const canvas=$('game');
+const ctx=canvas.getContext('2d');
+const lightCanvas=$('light-canvas');
+const lightCtx=lightCanvas.getContext('2d');
+const wrap=$('canvas-wrap');
+
+// ===== SCREENS =====
+const screens=['menu-screen','rules-screen','game-screen','gameover-screen','win-screen'];
+function showScreen(id){
+  screens.forEach(s=>{
+    const el=$(s);
+    el.classList.toggle('active',s===id);
+  });
+}
+
+// ===== AUDIO =====
+let audioCtx=null;
+function initAudio(){
+  if(audioCtx)return;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+}
+function playTone(freq,dur,type='sine',vol=0.08){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.type=type;o.frequency.value=freq;
+  g.gain.setValueAtTime(vol,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+  o.connect(g);g.connect(audioCtx.destination);
+  o.start();o.stop(audioCtx.currentTime+dur);
+}
+function playNoise(dur,vol=0.05){
+  if(!audioCtx)return;
+  const buf=audioCtx.createBuffer(1,audioCtx.sampleRate*dur,audioCtx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+  const src=audioCtx.createBufferSource();
+  src.buffer=buf;
+  const g=audioCtx.createGain();
+  g.gain.setValueAtTime(vol,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+  src.connect(g);g.connect(audioCtx.destination);
+  src.start();
+}
+function playFootstep(){playNoise(0.05,0.02)}
+function playDoorOpen(){playTone(200,0.15,'square',0.06);setTimeout(()=>playTone(280,0.1,'square',0.04),80)}
+function playCandy(){playTone(800,0.1,'sine',0.06);setTimeout(()=>playTone(1200,0.08,'sine',0.05),100)}
+function playCleaned(){playTone(400,0.15,'sine',0.05);setTimeout(()=>playTone(600,0.12,'sine',0.05),120);setTimeout(()=>playTone(800,0.1,'sine',0.06),240)}
+function playGrowl(){playTone(80,0.6,'sawtooth',0.1);playNoise(0.4,0.06)}
+function playBang(){playTone(60,0.3,'square',0.12);playNoise(0.15,0.08)}
+function playFlicker(){playTone(100,0.05,'square',0.04)}
+function playDeath(){playTone(200,0.5,'sawtooth',0.1);setTimeout(()=>playTone(100,0.8,'sawtooth',0.08),300)}
+function playWin(){playTone(523,0.2,'sine',0.06);setTimeout(()=>playTone(659,0.2,'sine',0.06),200);setTimeout(()=>playTone(784,0.3,'sine',0.07),400)}
+
+let ambience=null;
+function startAmbience(){
+  if(!audioCtx||ambience)return;
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.type='sine';o.frequency.value=55;
+  g.gain.value=0.015;
+  o.connect(g);g.connect(audioCtx.destination);
+  o.start();
+  ambience={osc:o,gain:g};
+}
+function stopAmbience(){
+  if(ambience){ambience.osc.stop();ambience=null}
+}
+
+// ===== MAP =====
+let map=[];
+let doors=[];// {x,y,open,banging,bangTimer}
+let desks=[];// {x,y,searched,hasCandy}
+let cleanSpots=[];// {x,y,cleaned}
+let sodaTiles=[];
+let windowTiles=[];
+let elevatorPos={x:0,y:0};
+let deskManPos={x:0,y:0};
+
+function buildMap(){
+  map=Array.from({length:MH},()=>Array(MW).fill(T.WALL));
+  doors=[];desks=[];cleanSpots=[];sodaTiles=[];windowTiles=[];
+
+  const fill=(x,y,w,h,t)=>{
+    for(let j=y;j<y+h&&j<MH;j++)
+      for(let i=x;i<x+w&&i<MW;i++)
+        map[j][i]=t;
+  };
+
+  // Outer border is already walls
+
+  // Main corridors
+  fill(1,1,MW-2,1,T.FLOOR);    // top passage
+  fill(1,MH-2,MW-2,1,T.FLOOR); // bottom passage
+  fill(1,10,MW-2,8,T.FLOOR);   // main wide corridor (rows 10-17)
+
+  // Vertical passages
+  const vPasses=[1,9,17,24,32,MW-2];
+  for(const vx of vPasses) fill(vx,1,1,MH-2,T.FLOOR);
+
+  // North rooms (rows 2-9)
+  const northRoomDefs=[
+    {x:2,w:7,type:'conference'},
+    {x:10,w:7,type:'office'},
+    {x:18,w:6,type:'soda'},
+    {x:25,w:7,type:'office'},
+    {x:33,w:9,type:'corner'},
+  ];
+
+  for(const r of northRoomDefs){
+    // Walls
+    fill(r.x,2,r.w,8,T.WALL);
+    // Interior
+    fill(r.x+1,3,r.w-2,6,T.FLOOR);
+    // Door at bottom
+    const dx=r.x+Math.floor(r.w/2);
+    map[9][dx]=T.DOOR;
+    doors.push({x:dx,y:9,open:false,banging:false,bangTimer:0});
+  }
+
+  // South rooms (rows 18-25)
+  const southRoomDefs=[
+    {x:2,w:7,type:'deskman'},
+    {x:10,w:7,type:'office'},
+    {x:18,w:6,type:'meeting'},
+    {x:25,w:7,type:'office'},
+    {x:33,w:9,type:'storage'},
+  ];
+
+  for(const r of southRoomDefs){
+    fill(r.x,18,r.w,8,T.WALL);
+    fill(r.x+1,19,r.w-2,6,T.FLOOR);
+    const dx=r.x+Math.floor(r.w/2);
+    map[18][dx]=T.DOOR;
+    doors.push({x:dx,y:18,open:false,banging:false,bangTimer:0});
+  }
+
+  // Soda room contents (north room 3, interior cols 19-22, rows 3-8)
+  for(let y=3;y<=8;y++){
+    for(let x=19;x<=22;x++){
+      if(map[y][x]===T.FLOOR){map[y][x]=T.SODA;sodaTiles.push({x,y})}
+    }
+  }
+
+  // Corner office windows (north room 5, cols 34-40, rows 3-8)
+  const cornerNWalls=[[33,3],[33,4],[33,5],[33,6],[33,7],[33,8],
+    [41,3],[41,4],[41,5],[41,6],[41,7],[41,8]];
+  // Add windows on east wall of corner office
+  if(MW>41){
+    for(let y=3;y<=8;y++){
+      if(map[y][41]===T.WALL){map[y][41]=T.WINDOW;windowTiles.push({x:41,y})}
+    }
+  }
+  // Windows on outer walls
+  [[1,0],[MW-2,0],[1,MH-1],[MW-2,MH-1],[15,0],[28,0],[15,MH-1],[28,MH-1]].forEach(([x,y])=>{
+    map[y][x]=T.WINDOW;windowTiles.push({x,y});
+  });
+  // South corner office windows
+  for(let y=19;y<=24;y++){
+    if(y<MH&&41<MW&&map[y][41]===T.WALL){map[y][41]=T.WINDOW;windowTiles.push({x:41,y})}
+  }
+
+  // Desks in rooms
+  const deskPositions=[
+    // North conference (cols 3-7, rows 3-8)
+    [4,4],[5,4],[4,6],[5,6],
+    // North office 1 (cols 11-15, rows 3-8)
+    [12,4],[13,4],[12,6],[14,6],
+    // North office 2 (cols 26-30, rows 3-8)
+    [27,4],[28,4],[27,7],[29,5],
+    // North corner (cols 34-40, rows 3-8)
+    [36,4],[37,4],[36,7],[38,5],[39,7],
+    // Corridor cubicles
+    [5,11],[6,11],[10,12],[11,12],[18,11],[19,11],
+    [26,13],[27,13],[33,11],[34,11],[38,14],[39,14],
+    [5,15],[6,15],[14,14],[15,14],[22,16],[23,16],
+    [30,15],[31,15],[37,16],[38,16],
+    // South deskman office (cols 3-7, rows 19-24)
+    [4,20],[5,20],
+    // South office 2 (cols 11-15, rows 19-24)
+    [12,20],[13,20],[12,22],[14,21],
+    // South meeting (cols 19-22, rows 19-24)
+    [19,20],[20,20],[21,20],[19,22],[20,22],[21,22],
+    // South office 3 (cols 26-30, rows 19-24)
+    [27,20],[28,20],[27,23],[29,22],
+    // South storage (cols 34-40, rows 19-24)
+    [36,20],[37,20],[35,22],[38,23],
+  ];
+
+  for(const[x,y]of deskPositions){
+    if(y<MH&&x<MW&&map[y][x]===T.FLOOR){
+      map[y][x]=T.DESK;
+      desks.push({x,y,searched:false,hasCandy:Math.random()<CANDY_CHANCE});
+    }
+  }
+
+  // Dark Desk Man position
+  deskManPos={x:4,y:21};
+
+  // Cleaning spots V1
+  const cleanV1=[[3,5],[12,13],[30,11],[36,6],[5,23]];
+  for(const[x,y]of cleanV1){
+    if(y<MH&&x<MW&&map[y][x]===T.FLOOR){
+      map[y][x]=T.CLEAN;
+      cleanSpots.push({x,y,cleaned:false,version:1});
+    }
+  }
+
+  // Elevator
+  elevatorPos={x:MW-2,y:14};
+  map[elevatorPos.y][elevatorPos.x]=T.ELEVATOR;
+
+  return map;
+}
+
+function addV2CleanSpots(){
+  const cleanV2=[[20,5],[28,16],[8,14],[35,22],[15,11]];
+  for(const[x,y]of cleanV2){
+    if(y<MH&&x<MW){
+      map[y][x]=T.CLEAN;
+      cleanSpots.push({x,y,cleaned:false,version:2});
+    }
+  }
+}
+
+function isWalkable(tx,ty){
+  if(tx<0||ty<0||tx>=MW||ty>=MH)return false;
+  const t=map[ty][tx];
+  if(t===T.WALL||t===T.WINDOW)return false;
+  if(t===T.DESK)return false;
+  if(t===T.DOOR){
+    const d=doors.find(d=>d.x===tx&&d.y===ty);
+    return d?d.open:false;
+  }
+  return true;
+}
+
+// ===== GAME STATE =====
+const state={
+  screen:'menu',
+  version:1,
+  candy:0,
+  cleaned:0,
+  totalClean:5,
+  battery:100,
+  vibration:0,
+  deathCount:0,// Entity 1 kills
+  sodaWarned:false,
+  sodaEntered:false,
+  knockerWarnings:0,
+  deskManTalks:0,
+  deskManGone:false,
+  eyesClosed:false,
+  eyesTimer:0,
+  eyesRequired:3,
+  gameTime:0,
+  paused:false,
+  tutorialAlpha:1,
+  tutorialTimer:6,
+  dialogueActive:false,
+  transitioning:false,
+  won:false,
+};
+
+// ===== PLAYER =====
+const player={
+  x:0,y:0,
+  dir:2,// 0=up,1=right,2=down,3=left
+  speed:WALK_SPEED,
+  sprinting:false,
+  stepTimer:0,
+  stepInterval:0.3,
+};
+
+function resetPlayer(){
+  player.x=MW-4;
+  player.y=14;
+  player.dir=3;
+  player.sprinting=false;
+  player.stepTimer=0;
+}
+
+// ===== INPUT =====
+const keys={};
+let touchDirs={up:false,down:false,left:false,right:false};
+let touchInteract=false;
+let touchEyes=false;
+
+document.addEventListener('keydown',e=>{
+  keys[e.code]=true;
+  if(e.code==='KeyE'&&state.screen==='playing')handleInteract();
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
+});
+document.addEventListener('keyup',e=>{keys[e.code]=false});
+
+// Touch
+document.querySelectorAll('.touch-btn[data-dir]').forEach(btn=>{
+  const dir=btn.dataset.dir;
+  btn.addEventListener('touchstart',e=>{e.preventDefault();touchDirs[dir]=true});
+  btn.addEventListener('touchend',e=>{e.preventDefault();touchDirs[dir]=false});
+  btn.addEventListener('touchcancel',e=>{touchDirs[dir]=false});
+});
+$('touch-interact')?.addEventListener('touchstart',e=>{e.preventDefault();touchInteract=true;if(state.screen==='playing')handleInteract()});
+$('touch-interact')?.addEventListener('touchend',e=>{touchInteract=false});
+$('touch-eyes')?.addEventListener('touchstart',e=>{e.preventDefault();touchEyes=true});
+$('touch-eyes')?.addEventListener('touchend',e=>{touchEyes=false});
+
+function movingUp(){return keys['KeyW']||keys['ArrowUp']||touchDirs.up}
+function movingDown(){return keys['KeyS']||keys['ArrowDown']||touchDirs.down}
+function movingLeft(){return keys['KeyA']||keys['ArrowLeft']||touchDirs.left}
+function movingRight(){return keys['KeyD']||keys['ArrowRight']||touchDirs.right}
+function isSprinting(){return keys['ShiftLeft']||keys['ShiftRight']}
+function isClosingEyes(){return keys['KeyC']||touchEyes}
+
+// ===== MESSAGES =====
+let messages=[];
+function showMessage(text,duration=3,color='var(--neon-red)'){
+  messages.push({text,timer:duration,maxTime:duration,color});
+}
+function updateMessages(dt){
+  messages.forEach(m=>m.timer-=dt);
+  messages=messages.filter(m=>m.timer>0);
+}
+
+// ===== SCREEN EFFECTS =====
+let shakeAmount=0;
+let shakeDur=0;
+let redFlash=0;
+let flickerTimer=0;
+let flickering=false;
+let staticAmount=0;
+
+function triggerShake(amount=4,dur=0.3){shakeAmount=amount;shakeDur=dur}
+function triggerRedFlash(dur=0.4){redFlash=dur}
+function triggerFlicker(dur=2){flickerTimer=dur;flickering=true}
+function triggerStatic(amount=0.3){staticAmount=amount}
+
+function updateEffects(dt){
+  if(shakeDur>0)shakeDur-=dt;
+  else shakeAmount=0;
+  if(redFlash>0)redFlash-=dt;
+  if(flickerTimer>0){
+    flickerTimer-=dt;
+    if(Math.random()<0.3)playFlicker();
+  }else flickering=false;
+  if(staticAmount>0)staticAmount=Math.max(0,staticAmount-dt*0.5);
+}
+
+// ===== ENTITIES =====
+
+// Entity 1 - The Collector
+const collector={
+  active:false,
+  x:0,y:0,
+  spawnTimer:35,
+  speed:1.2,
+  alpha:0,
+};
+
+function updateCollector(dt){
+  if(state.transitioning)return;
+  collector.spawnTimer-=dt;
+  if(!collector.active&&collector.spawnTimer<=0){
+    // Spawn far from player
+    let sx,sy,attempts=0;
+    do{
+      sx=2+Math.floor(Math.random()*(MW-4));
+      sy=2+Math.floor(Math.random()*(MH-4));
+      attempts++;
+    }while(attempts<100&&(!isWalkable(sx,sy)||Math.hypot(sx-player.x,sy-player.y)<10));
+    collector.x=sx;collector.y=sy;
+    collector.active=true;collector.alpha=0;
+    showMessage('You sense something approaching...',3,'#00e5ff');
+  }
+  if(collector.active){
+    collector.alpha=Math.min(1,collector.alpha+dt);
+    // Move toward player
+    const dx=player.x-collector.x;
+    const dy=player.y-collector.y;
+    const dist=Math.hypot(dx,dy);
+    if(dist>0.5){
+      const s=collector.speed*dt/dist;
+      const nx=collector.x+dx*s;
+      const ny=collector.y+dy*s;
+      collector.x=nx;collector.y=ny;
+    }
+    // Reached player
+    if(dist<0.8){
+      if(state.candy>0){
+        state.candy--;
+        showMessage('The Collector takes a candy and vanishes.',3,'var(--neon-yellow)');
+        playTone(300,0.2,'sine',0.05);
+      }else{
+        state.deathCount++;
+        triggerRedFlash(0.6);
+        triggerShake(6,0.4);
+        if(state.deathCount>=3){
+          gameOver('Too many have been taken.\nThe Collector has ended Floor 40.');
+          return;
+        }
+        showMessage('Someone in the building has been taken.\n('+(3-state.deathCount)+' remaining)',4,'var(--neon-red)');
+        playTone(100,0.5,'sawtooth',0.08);
+      }
+      collector.active=false;
+      collector.spawnTimer=state.version===1?(40+Math.random()*20):(25+Math.random()*15);
+    }
+  }
+}
+
+// Entity 2 - Dark Desk Man
+const deskManTips=[
+  'The one in the suit wants candy.\nAlways carry candy.',
+  'Do not enter the room with the\nred floor. He only warns once.',
+  'When the lights flicker, close\nyour eyes. Hold C and count.',
+  'Stay away from windows.\nDon\'t stare at your reflection.',
+  'The floor remembers every\nvibration. Walk slowly.',
+  'Some doors bang. Never open\na door that is banging.',
+];
+const deskManV2Lines=[
+  'The rules have changed.\nNothing is the same. Be careful.',
+  'I can\'t stay any longer.\nGoodbye, janitor.',
+];
+
+function talkToDeskMan(){
+  if(state.deskManGone)return;
+  state.dialogueActive=true;
+  const nameEl=$('dialogue-name');
+  const textEl=$('dialogue-text');
+
+  if(state.version===2){
+    const line=deskManV2Lines[Math.min(state.deskManTalks,deskManV2Lines.length-1)];
+    nameEl.textContent='DARK DESK MAN';
+    textEl.textContent=line;
+    state.deskManTalks++;
+    if(state.deskManTalks>=2)state.deskManGone=true;
+  }else{
+    const tip=deskManTips[state.deskManTalks%deskManTips.length];
+    nameEl.textContent='DARK DESK MAN';
+    textEl.textContent=tip;
+    state.deskManTalks++;
+  }
+  $('dialogue').classList.add('show');
+  playTone(440,0.1,'sine',0.04);
+}
+
+// Entity 3 - The Hoarder
+function checkSodaRoom(){
+  // Check if player is in soda room (north room 3 interior)
+  const px=Math.floor(player.x),py=Math.floor(player.y);
+  const inSoda=sodaTiles.some(s=>s.x===px&&s.y===py);
+  if(!inSoda){state.sodaEntered=false;return}
+
+  if(!state.sodaWarned&&state.version===1){
+    state.sodaWarned=true;
+    state.sodaEntered=true;
+    playGrowl();
+    triggerShake(8,0.5);
+    showMessage('Something GROWLS at you.\nLeave. Now.',4,'var(--neon-red)');
+  }else if(state.sodaEntered||(state.sodaWarned&&inSoda&&state.version===1)){
+    // Second entry in V1 or any entry in V2 after warning
+    if(!state.sodaEntered){
+      state.sodaEntered=true;
+      return;
+    }
+    // Check if they left and came back
+  }
+
+  if(state.version===2&&inSoda&&!state.sodaEntered){
+    state.sodaEntered=true;
+    playGrowl();
+    gameOver('The Hoarder doesn\'t give\nsecond chances.');
+  }
+}
+
+let sodaLeftAfterWarning=false;
+function updateHoarder(){
+  const px=Math.floor(player.x),py=Math.floor(player.y);
+  const inSoda=sodaTiles.some(s=>s.x===px&&s.y===py);
+
+  if(state.sodaWarned&&!inSoda){
+    sodaLeftAfterWarning=true;
+  }
+  if(sodaLeftAfterWarning&&inSoda&&state.version===1){
+    playGrowl();
+    gameOver('The Hoarder doesn\'t give\nsecond chances.');
+  }
+  if(state.version===2&&inSoda){
+    playGrowl();
+    gameOver('The Hoarder shows no mercy\nin Version 2.');
+  }
+}
+
+// Entity 4 - Tall Man
+const tallMan={
+  active:false,
+  x:0,y:0,
+  speed:2.5,
+  spawnTimer:20,
+  alpha:0,
+  cooldown:0,
+};
+
+function updateTallMan(dt){
+  if(state.transitioning)return;
+  if(tallMan.cooldown>0){tallMan.cooldown-=dt;return}
+
+  tallMan.spawnTimer-=dt;
+  const spawnChance=state.version===1?0.6:0.8;
+
+  if(!tallMan.active&&tallMan.spawnTimer<=0){
+    if(Math.random()<spawnChance){
+      // Spawn in corridor area
+      let sx,sy,attempts=0;
+      do{
+        sx=2+Math.floor(Math.random()*(MW-4));
+        sy=10+Math.floor(Math.random()*8);
+        attempts++;
+      }while(attempts<50&&(!isWalkable(sx,sy)||Math.hypot(sx-player.x,sy-player.y)<8));
+      tallMan.x=sx;tallMan.y=sy;
+      tallMan.active=true;tallMan.alpha=0;
+    }
+    tallMan.spawnTimer=state.version===1?(20+Math.random()*15):(12+Math.random()*10);
+  }
+
+  if(tallMan.active){
+    tallMan.alpha=Math.min(1,tallMan.alpha+dt*2);
+    const dx=player.x-tallMan.x;
+    const dy=player.y-tallMan.y;
+    const dist=Math.hypot(dx,dy);
+    if(dist>0.5){
+      const s=tallMan.speed*dt/dist;
+      tallMan.x+=dx*s;tallMan.y+=dy*s;
+    }
+    if(dist<1){
+      triggerShake(5,0.3);
+      triggerRedFlash(0.3);
+      showMessage('You feel a bruise forming.',2.5,'var(--neon-orange)');
+      playTone(150,0.2,'square',0.06);
+      tallMan.active=false;
+      tallMan.cooldown=8;
+      tallMan.spawnTimer=state.version===1?(20+Math.random()*15):(12+Math.random()*10);
+    }
+  }
+}
+
+// Entity 5 - The Blinker
+const blinker={
+  phase:'idle',// idle, warning, active, safe
+  timer:0,
+  spawnTimer:45,
+  x:0,y:0,
+  warningDur:3,
+};
+
+function updateBlinker(dt){
+  if(state.transitioning)return;
+  const req=state.version===1?3:5;
+  state.eyesRequired=req;
+
+  if(blinker.phase==='idle'){
+    blinker.spawnTimer-=dt;
+    if(blinker.spawnTimer<=0){
+      blinker.phase='warning';
+      blinker.timer=3;
+      triggerFlicker(3);
+      showMessage('The lights are flickering...',2.5,'var(--neon-yellow)');
+    }
+  }
+
+  if(blinker.phase==='warning'){
+    blinker.timer-=dt;
+    if(blinker.timer<=0){
+      // Spawn blinker
+      blinker.phase='active';
+      blinker.timer=8;// time limit to close eyes
+      blinker.x=player.x+((Math.random()>0.5?1:-1)*(3+Math.random()*4));
+      blinker.y=player.y+((Math.random()>0.5?1:-1)*(2+Math.random()*3));
+      showMessage('CLOSE YOUR EYES! (Hold C)',2,'var(--neon-red)');
+      playTone(2000,0.1,'square',0.08);
+      triggerStatic(0.6);
+    }
+  }
+
+  if(blinker.phase==='active'){
+    if(isClosingEyes()){
+      if(!state.eyesClosed){
+        state.eyesClosed=true;
+        state.eyesTimer=0;
+      }
+      state.eyesTimer+=dt;
+      $('eyes-overlay').classList.add('active');
+      $('eyes-timer').textContent=Math.max(0,Math.ceil(req-state.eyesTimer));
+
+      if(state.eyesTimer>=req){
+        // Survived
+        blinker.phase='idle';
+        blinker.spawnTimer=state.version===1?(45+Math.random()*30):(30+Math.random()*20);
+        state.eyesClosed=false;
+        $('eyes-overlay').classList.remove('active');
+        showMessage('The Blinker is gone.',2,'var(--neon-green)');
+        playTone(600,0.15,'sine',0.05);
+      }
+    }else{
+      if(state.eyesClosed){
+        // Opened eyes too early
+        state.eyesClosed=false;
+        $('eyes-overlay').classList.remove('active');
+        gameOver('You opened your eyes.\nThe Blinker saw you.');
+        return;
+      }
+      blinker.timer-=dt;
+      if(blinker.timer<=0){
+        gameOver('You didn\'t close your eyes.\nThe Blinker found you.');
+        return;
+      }
+    }
+  }
+}
+
+// Entity 6 - The Knocker
+const knocker={
+  activeDoor:null,
+  timer:0,
+  spawnTimer:30,
+};
+
+function updateKnocker(dt){
+  if(state.transitioning)return;
+
+  if(!knocker.activeDoor){
+    knocker.spawnTimer-=dt;
+    if(knocker.spawnTimer<=0){
+      // Pick a random closed door
+      const closedDoors=doors.filter(d=>!d.open);
+      if(closedDoors.length>0){
+        const d=closedDoors[Math.floor(Math.random()*closedDoors.length)];
+        d.banging=true;
+        d.bangTimer=15;
+        knocker.activeDoor=d;
+        showMessage('You hear banging on a door...',3,'var(--neon-orange)');
+      }
+      knocker.spawnTimer=state.version===1?(25+Math.random()*15):(15+Math.random()*10);
+    }
+  }else{
+    knocker.activeDoor.bangTimer-=dt;
+    knocker.timer+=dt;
+    if(knocker.timer>1.5){
+      playBang();
+      knocker.timer=0;
+    }
+    if(knocker.activeDoor.bangTimer<=0){
+      knocker.activeDoor.banging=false;
+      knocker.activeDoor=null;
+      knocker.timer=0;
+    }
+  }
+}
+
+// Entity 7 - The Mirror
+const mirror={
+  stareTimer:0,
+  active:false,
+  reflX:0,reflY:0,
+  speed:4,
+  nearWindow:false,
+};
+
+function updateMirror(dt){
+  if(state.transitioning)return;
+  const px=Math.floor(player.x),py=Math.floor(player.y);
+
+  // Check if player is near any window (within 2 tiles)
+  let nearWin=false;
+  for(const w of windowTiles){
+    if(Math.hypot(w.x-px,w.y-py)<=2.5){nearWin=true;break}
+  }
+  mirror.nearWindow=nearWin;
+
+  if(nearWin){
+    mirror.stareTimer+=dt;
+    if(mirror.stareTimer>=2.5&&!mirror.active){
+      mirror.active=true;
+      mirror.reflX=player.x;mirror.reflY=player.y;
+      showMessage('Something moves in the reflection...',2,'var(--neon-pink)');
+      playTone(1500,0.3,'sawtooth',0.06);
+    }
+  }else{
+    mirror.stareTimer=Math.max(0,mirror.stareTimer-dt*2);
+    if(mirror.stareTimer<=0)mirror.active=false;
+  }
+
+  if(mirror.active){
+    const dx=player.x-mirror.reflX;
+    const dy=player.y-mirror.reflY;
+    const dist=Math.hypot(dx,dy);
+    if(dist>0.5){
+      const s=mirror.speed*dt/dist;
+      mirror.reflX+=dx*s;mirror.reflY+=dy*s;
+    }
+    if(dist<0.6){
+      gameOver('Your reflection reached you.\nYou should never have looked.');
+    }
+  }
+}
+
+// Entity 0 - Marcus Webb (The Floor)
+function updateFloor(dt){
+  if(state.transitioning)return;
+  const moving=movingUp()||movingDown()||movingLeft()||movingRight();
+  if(moving){
+    const rate=player.sprinting?3.5:0.4;
+    state.vibration=Math.min(100,state.vibration+rate*dt);
+  }else{
+    state.vibration=Math.max(0,state.vibration-1.5*dt);
+  }
+
+  // Visual feedback
+  const bar=$('vib-bar');
+  const fill=$('vib-fill');
+  if(state.vibration>5){
+    bar.classList.add('show');
+    fill.style.width=state.vibration+'%';
+    fill.style.background=state.vibration>70?'var(--neon-red)':state.vibration>40?'var(--neon-orange)':'var(--neon-yellow)';
+  }else{
+    bar.classList.remove('show');
+  }
+
+  if(state.vibration>=80){
+    triggerShake(2,0.1);
+    if(Math.random()<0.05)playTone(40,0.1,'square',0.03);
+  }
+
+  if(state.vibration>=100){
+    gameOver('The floor cracks beneath you.\nMarcus Webb has found you.');
+  }
+}
+
+// ===== INTERACTION =====
+function handleInteract(){
+  if(state.dialogueActive){
+    state.dialogueActive=false;
+    $('dialogue').classList.remove('show');
+    return;
+  }
+  if(state.paused||state.transitioning)return;
+
+  const dirs=[[0,-1],[1,0],[0,1],[-1,0]];
+  const[ddx,ddy]=dirs[player.dir];
+  const tx=Math.floor(player.x+ddx);
+  const ty=Math.floor(player.y+ddy);
+
+  if(tx<0||ty<0||tx>=MW||ty>=MH)return;
+  const tile=map[ty][tx];
+
+  // Also check tile player is standing on
+  const stx=Math.floor(player.x),sty=Math.floor(player.y);
+
+  // Door interaction
+  if(tile===T.DOOR){
+    const d=doors.find(d=>d.x===tx&&d.y===ty);
+    if(d){
+      if(d.banging){
+        state.knockerWarnings++;
+        d.banging=false;
+        d.open=true;
+        if(knocker.activeDoor===d)knocker.activeDoor=null;
+        showMessage('You opened a banging door!\nWarning '+(state.knockerWarnings)+'/3',3,'var(--neon-orange)');
+        playDoorOpen();
+        if(state.knockerWarnings>=3){
+          setTimeout(()=>gameOver('An executive on Floor 40 has been killed.\nYou opened too many doors.'),1500);
+        }
+      }else{
+        d.open=!d.open;
+        playDoorOpen();
+      }
+    }
+    return;
+  }
+
+  // Desk interaction
+  if(tile===T.DESK){
+    const desk=desks.find(d=>d.x===tx&&d.y===ty);
+    if(desk&&!desk.searched){
+      desk.searched=true;
+      if(desk.hasCandy){
+        state.candy++;
+        showMessage('Found candy!',1.5,'var(--neon-yellow)');
+        playCandy();
+      }else{
+        showMessage('Empty desk.',1,'var(--dim)');
+        playTone(200,0.05,'sine',0.02);
+      }
+    }
+    return;
+  }
+
+  // Clean spot interaction (also check standing on)
+  if(tile===T.CLEAN||map[sty][stx]===T.CLEAN){
+    const cx=tile===T.CLEAN?tx:stx;
+    const cy=tile===T.CLEAN?ty:sty;
+    const spot=cleanSpots.find(s=>s.x===cx&&s.y===cy&&!s.cleaned);
+    if(spot){
+      spot.cleaned=true;
+      map[cy][cx]=T.FLOOR;
+      state.cleaned++;
+      playCleaned();
+      showMessage('Cleaned! ('+state.cleaned+'/'+state.totalClean+')',2,'var(--neon-green)');
+      checkCleanProgress();
+    }
+    return;
+  }
+
+  // Dark Desk Man
+  if(Math.floor(player.x)===deskManPos.x&&Math.floor(player.y)===deskManPos.y-1
+    ||Math.floor(player.x)===deskManPos.x&&Math.floor(player.y)===deskManPos.y+1
+    ||Math.floor(player.x)===deskManPos.x-1&&Math.floor(player.y)===deskManPos.y
+    ||Math.floor(player.x)===deskManPos.x+1&&Math.floor(player.y)===deskManPos.y
+    ||(Math.abs(player.x-deskManPos.x)<1.5&&Math.abs(player.y-deskManPos.y)<1.5)){
+    talkToDeskMan();
+    return;
+  }
+
+  // Elevator
+  if(tile===T.ELEVATOR||(stx===elevatorPos.x&&sty===elevatorPos.y)){
+    if(state.cleaned>=state.totalClean){
+      if(state.version===1){
+        transitionToV2();
+      }else{
+        winGame();
+      }
+    }else{
+      showMessage('Elevator locked.\nClean all spots first. ('+state.cleaned+'/'+state.totalClean+')',3,'var(--dim)');
+    }
+  }
+}
+
+function checkCleanProgress(){
+  if(state.cleaned>=state.totalClean){
+    showMessage('All spots cleaned!\nGet to the elevator!',3,'var(--neon-green)');
+  }
+}
+
+// ===== V1 -> V2 TRANSITION =====
+function transitionToV2(){
+  state.transitioning=true;
+  $('transition').classList.add('active');
+
+  const lines=[$('t-line1'),$('t-line2'),$('t-line3')];
+  setTimeout(()=>lines[0].style.opacity='1',500);
+  setTimeout(()=>lines[1].style.opacity='1',2000);
+  setTimeout(()=>lines[2].style.opacity='1',3500);
+  setTimeout(()=>{
+    state.version=2;
+    state.cleaned=0;
+    state.totalClean=5;
+    state.sodaWarned=false;
+    state.sodaEntered=false;
+    sodaLeftAfterWarning=false;
+    state.deskManTalks=0;
+    state.eyesRequired=5;
+
+    // Add V2 cleaning spots
+    addV2CleanSpots();
+
+    // Reset entity timers
+    collector.spawnTimer=20;
+    tallMan.spawnTimer=10;
+    blinker.spawnTimer=25;
+    knocker.spawnTimer=15;
+
+    // Update HUD
+    $('hud-version').textContent='V2';
+    $('hud-version').style.color='var(--neon-red)';
+
+    lines.forEach(l=>l.style.opacity='0');
+    setTimeout(()=>{
+      $('transition').classList.remove('active');
+      state.transitioning=false;
+      showMessage('Version 2 active.\nThe rules have changed.',4,'var(--neon-red)');
+      triggerShake(3,0.5);
+    },1000);
+  },5500);
+}
+
+// ===== GAME OVER / WIN =====
+function gameOver(reason){
+  if(state.screen!=='playing')return;
+  state.screen='gameover';
+  playDeath();
+  triggerRedFlash(1);
+  $('death-reason').textContent=reason;
+  stopAmbience();
+  setTimeout(()=>showScreen('gameover-screen'),800);
+}
+
+function winGame(){
+  if(state.screen!=='playing')return;
+  state.screen='win';
+  state.won=true;
+  playWin();
+  const mins=Math.floor(state.gameTime/60);
+  const secs=Math.floor(state.gameTime%60);
+  $('win-stats').textContent='Time: '+mins+'m '+secs+'s | Candy used: '+(state.deathCount>0?state.deathCount+' lost':'none lost');
+  stopAmbience();
+  setTimeout(()=>showScreen('win-screen'),500);
+}
+
+// ===== PLAYER UPDATE =====
+function updatePlayer(dt){
+  if(state.paused||state.transitioning||state.dialogueActive)return;
+
+  player.sprinting=isSprinting();
+  const spd=player.sprinting?SPRINT_SPEED:WALK_SPEED;
+  let dx=0,dy=0;
+
+  if(movingUp()){dy=-1;player.dir=0}
+  if(movingDown()){dy=1;player.dir=2}
+  if(movingLeft()){dx=-1;player.dir=3}
+  if(movingRight()){dx=1;player.dir=1}
+
+  if(dx!==0&&dy!==0){dx*=0.707;dy*=0.707}
+
+  if(dx!==0||dy!==0){
+    const nx=player.x+dx*spd*dt;
+    const ny=player.y+dy*spd*dt;
+
+    // Slide collision
+    if(canMoveTo(nx,player.y))player.x=nx;
+    else if(dx!==0&&canMoveTo(player.x+dx*spd*dt*0.5,player.y))player.x+=dx*spd*dt*0.5;
+
+    if(canMoveTo(player.x,ny))player.y=ny;
+    else if(dy!==0&&canMoveTo(player.x,player.y+dy*spd*dt*0.5))player.y+=dy*spd*dt*0.5;
+
+    // Footstep sounds
+    player.stepTimer-=dt;
+    if(player.stepTimer<=0){
+      playFootstep();
+      player.stepTimer=player.sprinting?0.2:0.32;
+    }
+
+    // Tutorial fade
+    if(state.tutorialAlpha>0)state.tutorialAlpha=0;
+  }
+
+  // Battery drain/charge
+  const inDark=isInDarkZone(Math.floor(player.x),Math.floor(player.y));
+  if(inDark){
+    state.battery=Math.max(0,state.battery-dt*3);
+  }else{
+    state.battery=Math.min(100,state.battery+dt*5);
+  }
+}
+
+function canMoveTo(x,y){
+  const pad=0.2;
+  return isWalkable(Math.floor(x-pad),Math.floor(y-pad))
+    &&isWalkable(Math.floor(x+pad),Math.floor(y-pad))
+    &&isWalkable(Math.floor(x-pad),Math.floor(y+pad))
+    &&isWalkable(Math.floor(x+pad),Math.floor(y+pad));
+}
+
+function isInDarkZone(tx,ty){
+  // Corridor is lit in V1, dark edges in V2
+  if(state.version===1)return ty<2||ty>MH-3;
+  return ty<10||ty>17;// V2: only corridor is lit
+}
+
+// ===== RENDERING =====
+let dpr=1;
+let canvasW=0,canvasH=0;
+let viewW=0,viewH=0;// in tiles
+
+function resizeCanvas(){
+  dpr=window.devicePixelRatio||1;
+  const maxW=Math.min(window.innerWidth-2,720);
+  const maxH=Math.min(window.innerHeight-50,520);
+  canvasW=maxW;canvasH=maxH;
+
+  canvas.style.width=canvasW+'px';
+  canvas.style.height=canvasH+'px';
+  canvas.width=canvasW*dpr;
+  canvas.height=canvasH*dpr;
+
+  lightCanvas.style.width=canvasW+'px';
+  lightCanvas.style.height=canvasH+'px';
+  lightCanvas.width=canvasW*dpr;
+  lightCanvas.height=canvasH*dpr;
+
+  viewW=Math.ceil(canvasW/TILE)+2;
+  viewH=Math.ceil(canvasH/TILE)+2;
+}
+
+function render(){
+  const w=canvas.width,h=canvas.height;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  // Clear
+  ctx.fillStyle=COL.wall;
+  ctx.fillRect(0,0,canvasW,canvasH);
+
+  // Camera
+  let camX=player.x*TILE-canvasW/2+TILE/2;
+  let camY=player.y*TILE-canvasH/2+TILE/2;
+  camX=Math.max(0,Math.min(camX,MW*TILE-canvasW));
+  camY=Math.max(0,Math.min(camY,MH*TILE-canvasH));
+
+  // Shake
+  let sx=0,sy=0;
+  if(shakeAmount>0){
+    sx=(Math.random()-0.5)*shakeAmount*2;
+    sy=(Math.random()-0.5)*shakeAmount*2;
+  }
+
+  ctx.save();
+  ctx.translate(-camX+sx,-camY+sy);
+
+  // Visible tile range
+  const startX=Math.max(0,Math.floor(camX/TILE));
+  const startY=Math.max(0,Math.floor(camY/TILE));
+  const endX=Math.min(MW,startX+viewW);
+  const endY=Math.min(MH,startY+viewH);
+
+  // Draw tiles
+  for(let y=startY;y<endY;y++){
+    for(let x=startX;x<endX;x++){
+      drawTile(x,y);
+    }
+  }
+
+  // Draw cleaning spots (uncleaned)
+  for(const s of cleanSpots){
+    if(!s.cleaned&&s.x>=startX&&s.x<endX&&s.y>=startY&&s.y<endY){
+      ctx.fillStyle=COL.cleanGlow;
+      ctx.fillRect(s.x*TILE,s.y*TILE,TILE,TILE);
+      // Pulsing indicator
+      const pulse=0.4+0.3*Math.sin(state.gameTime*3);
+      ctx.fillStyle=`rgba(255,230,0,${pulse*0.15})`;
+      ctx.beginPath();
+      ctx.arc(s.x*TILE+TILE/2,s.y*TILE+TILE/2,TILE/3,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  // Draw Dark Desk Man
+  if(!state.deskManGone){
+    const mx=deskManPos.x*TILE+TILE/2;
+    const my=deskManPos.y*TILE+TILE/2;
+    ctx.fillStyle='rgba(57,255,20,0.15)';
+    ctx.beginPath();
+    ctx.arc(mx,my,TILE*0.8,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle='#39ff14';
+    ctx.beginPath();
+    ctx.arc(mx,my,TILE/4,0,Math.PI*2);
+    ctx.fill();
+    // Hat/head
+    ctx.fillStyle='#2a6a2a';
+    ctx.fillRect(mx-TILE/4,my-TILE/3,TILE/2,TILE/4);
+  }
+
+  // Draw entities
+  renderCollector(camX,camY);
+  renderTallMan();
+  renderBlinker();
+  renderMirrorReflection();
+
+  // Draw player
+  if(!state.eyesClosed){
+    drawPlayer();
+  }
+
+  ctx.restore();
+
+  // Lighting
+  renderLighting(camX-sx,camY-sy);
+
+  // Flicker effect
+  if(flickering&&Math.random()<0.4){
+    ctx.fillStyle='rgba(255,255,255,0.06)';
+    ctx.fillRect(0,0,canvasW,canvasH);
+  }
+
+  // Red flash
+  if(redFlash>0){
+    ctx.fillStyle=`rgba(255,0,0,${Math.min(0.3,redFlash*0.5)})`;
+    ctx.fillRect(0,0,canvasW,canvasH);
+  }
+
+  // Static
+  if(staticAmount>0){
+    const imgData=ctx.getImageData(0,0,Math.min(200,canvasW),Math.min(150,canvasH));
+    const d=imgData.data;
+    for(let i=0;i<d.length;i+=4){
+      if(Math.random()<staticAmount*0.3){
+        const v=Math.random()*255;
+        d[i]=d[i+1]=d[i+2]=v;
+      }
+    }
+    ctx.putImageData(imgData,0,0);
+  }
+
+  // Messages
+  renderMessages();
+
+  // Tutorial
+  if(state.tutorialAlpha>0){
+    const tut=$('tutorial');
+    tut.style.opacity=state.tutorialAlpha;
+  }else{
+    $('tutorial').style.opacity='0';
+  }
+}
+
+function drawTile(x,y){
+  const t=map[y][x];
+  const px=x*TILE,py=y*TILE;
+
+  switch(t){
+    case T.FLOOR:{
+      ctx.fillStyle=(x+y)%2===0?COL.floor:COL.floorAlt;
+      ctx.fillRect(px,py,TILE,TILE);
+      break;
+    }
+    case T.WALL:{
+      ctx.fillStyle=COL.wall;
+      ctx.fillRect(px,py,TILE,TILE);
+      ctx.fillStyle=COL.wallTop;
+      ctx.fillRect(px,py,TILE,TILE-4);
+      // Subtle border
+      ctx.strokeStyle='#1a1a30';
+      ctx.lineWidth=0.5;
+      ctx.strokeRect(px,py,TILE,TILE);
+      break;
+    }
+    case T.DESK:{
+      ctx.fillStyle=(x+y)%2===0?COL.floor:COL.floorAlt;
+      ctx.fillRect(px,py,TILE,TILE);
+      // Desk body
+      ctx.fillStyle=COL.desk;
+      ctx.fillRect(px+2,py+2,TILE-4,TILE-4);
+      ctx.fillStyle=COL.deskTop;
+      ctx.fillRect(px+3,py+3,TILE-6,TILE-8);
+      // Check if searched
+      const desk=desks.find(d=>d.x===x&&d.y===y);
+      if(desk&&desk.searched){
+        ctx.fillStyle='rgba(90,90,122,0.3)';
+        ctx.fillRect(px+3,py+3,TILE-6,TILE-8);
+      }
+      break;
+    }
+    case T.DOOR:{
+      const d=doors.find(d=>d.x===x&&d.y===y);
+      if(d&&d.open){
+        ctx.fillStyle=COL.doorOpen;
+        ctx.fillRect(px,py,TILE,TILE);
+      }else{
+        ctx.fillStyle=COL.door;
+        ctx.fillRect(px,py,TILE,TILE);
+        // Door lines
+        ctx.strokeStyle='#3a3a5a';
+        ctx.lineWidth=1;
+        ctx.strokeRect(px+2,py+1,TILE-4,TILE-2);
+        // Handle
+        ctx.fillStyle='var(--neon-yellow)';
+        ctx.fillRect(px+TILE-7,py+TILE/2-1,3,3);
+        // Banging effect
+        if(d&&d.banging){
+          const shake=Math.sin(state.gameTime*20)*2;
+          ctx.fillStyle='rgba(255,140,0,0.2)';
+          ctx.fillRect(px+shake,py,TILE,TILE);
+        }
+      }
+      break;
+    }
+    case T.WINDOW:{
+      ctx.fillStyle=COL.window;
+      ctx.fillRect(px,py,TILE,TILE);
+      // Reflection shimmer
+      const shimmer=0.05+0.03*Math.sin(state.gameTime*2+x*3);
+      ctx.fillStyle=`rgba(100,180,255,${shimmer})`;
+      ctx.fillRect(px+2,py+2,TILE-4,TILE-4);
+      // Glass lines
+      ctx.strokeStyle='rgba(100,180,255,0.15)';
+      ctx.lineWidth=0.5;
+      ctx.beginPath();
+      ctx.moveTo(px+TILE/2,py);ctx.lineTo(px+TILE/2,py+TILE);
+      ctx.moveTo(px,py+TILE/2);ctx.lineTo(px+TILE,py+TILE/2);
+      ctx.stroke();
+      break;
+    }
+    case T.ELEVATOR:{
+      ctx.fillStyle=COL.elevator;
+      ctx.fillRect(px,py,TILE,TILE);
+      // Elevator doors
+      ctx.strokeStyle=state.cleaned>=state.totalClean?COL.elevGlow:'#3a3a4a';
+      ctx.lineWidth=2;
+      ctx.strokeRect(px+2,py+2,TILE-4,TILE-4);
+      // Gap in middle
+      ctx.beginPath();
+      ctx.moveTo(px+TILE/2,py+2);ctx.lineTo(px+TILE/2,py+TILE-2);
+      ctx.stroke();
+      // Indicator light
+      if(state.cleaned>=state.totalClean){
+        ctx.fillStyle=COL.elevGlow;
+        ctx.shadowColor=COL.elevGlow;ctx.shadowBlur=8;
+        ctx.fillRect(px+TILE/2-2,py+1,4,3);
+        ctx.shadowBlur=0;
+      }
+      break;
+    }
+    case T.SODA:{
+      ctx.fillStyle=COL.soda;
+      ctx.fillRect(px,py,TILE,TILE);
+      // Soda cans
+      if(Math.random()<0.01||((x+y*7)%3===0)){
+        ctx.fillStyle=COL.sodaCan;
+        ctx.fillRect(px+TILE/3,py+TILE/3,TILE/4,TILE/3);
+      }
+      break;
+    }
+    case T.CLEAN:{
+      ctx.fillStyle=COL.clean;
+      ctx.fillRect(px,py,TILE,TILE);
+      break;
+    }
+  }
+}
+
+function drawPlayer(){
+  const px=player.x*TILE+TILE/2;
+  const py=player.y*TILE+TILE/2;
+  const r=TILE/3;
+
+  // Glow
+  ctx.fillStyle=COL.playerGlow;
+  ctx.beginPath();
+  ctx.arc(px,py,r+4,0,Math.PI*2);
+  ctx.fill();
+
+  // Body
+  ctx.fillStyle=COL.player;
+  ctx.beginPath();
+  ctx.arc(px,py,r,0,Math.PI*2);
+  ctx.fill();
+
+  // Direction indicator
+  const dirs=[[0,-1],[1,0],[0,1],[-1,0]];
+  const[ddx,ddy]=dirs[player.dir];
+  ctx.strokeStyle='#fff';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(px,py);
+  ctx.lineTo(px+ddx*(r+4),py+ddy*(r+4));
+  ctx.stroke();
+}
+
+function renderCollector(){
+  if(!collector.active)return;
+  const px=collector.x*TILE+TILE/2;
+  const py=collector.y*TILE+TILE/2;
+
+  ctx.globalAlpha=collector.alpha*0.8;
+  // Floating suit silhouette
+  const bob=Math.sin(state.gameTime*3)*3;
+  // Body
+  ctx.fillStyle='#0a4a4a';
+  ctx.fillRect(px-8,py-12+bob,16,20);
+  // Shoulders
+  ctx.fillRect(px-12,py-10+bob,24,4);
+  // Head (dark void)
+  ctx.fillStyle='#000';
+  ctx.beginPath();
+  ctx.arc(px,py-16+bob,6,0,Math.PI*2);
+  ctx.fill();
+  // Glow
+  ctx.shadowColor='#00e5ff';ctx.shadowBlur=15;
+  ctx.strokeStyle='rgba(0,229,255,0.4)';
+  ctx.lineWidth=1;
+  ctx.strokeRect(px-8,py-12+bob,16,20);
+  ctx.shadowBlur=0;
+
+  ctx.globalAlpha=1;
+}
+
+function renderTallMan(){
+  if(!tallMan.active)return;
+  const px=tallMan.x*TILE+TILE/2;
+  const py=tallMan.y*TILE+TILE/2;
+
+  ctx.globalAlpha=tallMan.alpha*0.7;
+  // Tall thin figure
+  ctx.fillStyle='#4a4a00';
+  ctx.fillRect(px-4,py-24,8,36);
+  // Head
+  ctx.fillStyle='#6a6a00';
+  ctx.beginPath();
+  ctx.arc(px,py-28,5,0,Math.PI*2);
+  ctx.fill();
+  // Glow
+  ctx.shadowColor='#ffe600';ctx.shadowBlur=10;
+  ctx.strokeStyle='rgba(255,230,0,0.3)';
+  ctx.lineWidth=1;
+  ctx.strokeRect(px-4,py-24,8,36);
+  ctx.shadowBlur=0;
+
+  ctx.globalAlpha=1;
+}
+
+function renderBlinker(){
+  if(blinker.phase!=='active'||state.eyesClosed)return;
+  const px=blinker.x*TILE+TILE/2;
+  const py=blinker.y*TILE+TILE/2;
+
+  // Glitch/static figure
+  ctx.globalAlpha=0.6+Math.random()*0.4;
+  for(let i=0;i<12;i++){
+    const ox=(Math.random()-0.5)*16;
+    const oy=(Math.random()-0.5)*24;
+    ctx.fillStyle=Math.random()>0.5?'#fff':'#888';
+    ctx.fillRect(px+ox,py+oy-8,Math.random()*8+2,2);
+  }
+  // Core
+  ctx.fillStyle='rgba(255,255,255,0.8)';
+  ctx.fillRect(px-6,py-12,12,24);
+  ctx.globalAlpha=1;
+}
+
+function renderMirrorReflection(){
+  if(!mirror.active)return;
+  const px=mirror.reflX*TILE+TILE/2;
+  const py=mirror.reflY*TILE+TILE/2;
+
+  // Distorted player copy
+  ctx.globalAlpha=0.5+Math.sin(state.gameTime*10)*0.2;
+  ctx.fillStyle='rgba(255,45,123,0.3)';
+  ctx.beginPath();
+  ctx.arc(px,py,TILE/3+2,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle='#ff2d7b';
+  ctx.beginPath();
+  ctx.arc(px+(Math.random()-0.5)*3,py+(Math.random()-0.5)*3,TILE/3,0,Math.PI*2);
+  ctx.fill();
+  ctx.globalAlpha=1;
+}
+
+// ===== LIGHTING =====
+function renderLighting(camX,camY){
+  lightCtx.setTransform(dpr,0,0,dpr,0,0);
+
+  // Base darkness level
+  const baseDark=state.version===1?0.55:0.75;
+  lightCtx.fillStyle=`rgba(0,0,0,${baseDark})`;
+  lightCtx.fillRect(0,0,canvasW,canvasH);
+
+  lightCtx.globalCompositeOperation='destination-out';
+
+  // Player light (flashlight)
+  const plx=player.x*TILE+TILE/2-camX;
+  const ply=player.y*TILE+TILE/2-camY;
+  const lightRad=TILE*(state.battery>0?(4+state.battery/30):2);
+
+  const grad=lightCtx.createRadialGradient(plx,ply,0,plx,ply,lightRad);
+  grad.addColorStop(0,'rgba(0,0,0,1)');
+  grad.addColorStop(0.6,'rgba(0,0,0,0.6)');
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  lightCtx.fillStyle=grad;
+  lightCtx.beginPath();
+  lightCtx.arc(plx,ply,lightRad,0,Math.PI*2);
+  lightCtx.fill();
+
+  // Lit zones (safe areas)
+  if(state.version===1){
+    // In V1, the corridor and rooms are partially lit
+    for(let y=9;y<=18;y++){
+      for(let x=0;x<MW;x++){
+        if(map[y][x]!==T.WALL){
+          const tx=x*TILE+TILE/2-camX;
+          const ty=y*TILE+TILE/2-camY;
+          if(tx>-TILE&&tx<canvasW+TILE&&ty>-TILE&&ty<canvasH+TILE){
+            lightCtx.fillStyle='rgba(0,0,0,0.3)';
+            lightCtx.fillRect(tx-TILE/2,ty-TILE/2,TILE,TILE);
+          }
+        }
+      }
+    }
+  }else{
+    // V2: only small pools of light
+    const lightPools=[[10,12],[20,14],[30,12],[38,14]];
+    for(const[lx,ly]of lightPools){
+      const tx=lx*TILE+TILE/2-camX;
+      const ty=ly*TILE+TILE/2-camY;
+      const g2=lightCtx.createRadialGradient(tx,ty,0,tx,ty,TILE*3);
+      g2.addColorStop(0,'rgba(0,0,0,0.6)');
+      g2.addColorStop(1,'rgba(0,0,0,0)');
+      lightCtx.fillStyle=g2;
+      lightCtx.beginPath();
+      lightCtx.arc(tx,ty,TILE*3,0,Math.PI*2);
+      lightCtx.fill();
+    }
+  }
+
+  // Elevator glow
+  if(state.cleaned>=state.totalClean){
+    const ex=elevatorPos.x*TILE+TILE/2-camX;
+    const ey=elevatorPos.y*TILE+TILE/2-camY;
+    const eg=lightCtx.createRadialGradient(ex,ey,0,ex,ey,TILE*3);
+    eg.addColorStop(0,'rgba(0,0,0,0.8)');
+    eg.addColorStop(1,'rgba(0,0,0,0)');
+    lightCtx.fillStyle=eg;
+    lightCtx.beginPath();
+    lightCtx.arc(ex,ey,TILE*3,0,Math.PI*2);
+    lightCtx.fill();
+  }
+
+  lightCtx.globalCompositeOperation='source-over';
+}
+
+// ===== MESSAGES RENDER =====
+function renderMessages(){
+  if(messages.length===0)return;
+  const msg=messages[messages.length-1];
+  const el=$('msg-text');
+  el.textContent=msg.text;
+  el.style.color=msg.color;
+  const fadeIn=msg.maxTime-msg.timer<0.5;
+  const fadeOut=msg.timer<0.5;
+  if(fadeIn)el.classList.add('show');
+  if(fadeOut)el.classList.remove('show');
+  else el.classList.add('show');
+}
+
+// ===== HUD =====
+function updateHUD(){
+  $('hud-candy').textContent='CANDY: '+state.candy;
+  $('hud-clean').textContent='CLEAN: '+state.cleaned+'/'+state.totalClean;
+  $('hud-battery').textContent='LIGHT: '+Math.round(state.battery)+'%';
+}
+
+// ===== RULES =====
+function showRules(){
+  const list=$('rules-list');
+  list.innerHTML='';
+
+  const v1Rules=[
+    {num:'05',text:'When the lights flicker, close your eyes immediately. Hold C.'},
+    {num:'06',text:'Do not open doors that are banging. Three strikes and someone dies.'},
+    {num:'00',text:'Do not run. The floor tracks vibrations. Walk slowly.'},
+    {num:'--',text:'Collect candy from desks. You will need it.'},
+    {num:'--',text:'Clean all dirty spots on the floor to proceed.'},
+  ];
+  const v2Rules=[
+    {num:'!!',text:'The rules have changed. Trust nothing.'},
+    {num:'05',text:'Hold C for LONGER now. The count has changed.'},
+    {num:'03',text:'The soda room is no longer forgiving.'},
+    {num:'00',text:'The floor is more sensitive. Be very careful.'},
+    {num:'--',text:'New spots have appeared. Clean them all.'},
+  ];
+
+  const rules=state.version===1?v1Rules:v2Rules;
+  rules.forEach(r=>{
+    const li=document.createElement('li');
+    li.innerHTML='<span class="rule-num">['+r.num+']</span> '+r.text;
+    list.appendChild(li);
+  });
+
+  showScreen('rules-screen');
+}
+
+// ===== GAME INIT =====
+function startGame(){
+  initAudio();
+  buildMap();
+  resetPlayer();
+
+  // Reset state
+  Object.assign(state,{
+    screen:'playing',version:1,candy:0,cleaned:0,totalClean:5,
+    battery:100,vibration:0,deathCount:0,sodaWarned:false,sodaEntered:false,
+    knockerWarnings:0,deskManTalks:0,deskManGone:false,eyesClosed:false,
+    eyesTimer:0,eyesRequired:3,gameTime:0,paused:false,
+    tutorialAlpha:1,tutorialTimer:6,dialogueActive:false,transitioning:false,won:false,
+  });
+  sodaLeftAfterWarning=false;
+
+  // Reset entities
+  collector.active=false;collector.spawnTimer=35;
+  tallMan.active=false;tallMan.spawnTimer=20;tallMan.cooldown=0;
+  blinker.phase='idle';blinker.spawnTimer=45;
+  knocker.activeDoor=null;knocker.spawnTimer=30;knocker.timer=0;
+  mirror.stareTimer=0;mirror.active=false;
+
+  $('hud-version').textContent='V1';
+  $('hud-version').style.color='var(--neon-red)';
+  $('eyes-overlay').classList.remove('active');
+  $('dialogue').classList.remove('show');
+  $('transition').classList.remove('active');
+  $('vib-bar').classList.remove('show');
+
+  // Reset door states
+  doors.forEach(d=>{d.open=false;d.banging=false;d.bangTimer=0});
+
+  messages=[];
+
+  resizeCanvas();
+  showScreen('game-screen');
+  startAmbience();
+}
+
+// ===== MAIN LOOP =====
+let lastTime=0;
+function loop(ts){
+  const dt=Math.min((ts-lastTime)/1000,0.1);
+  lastTime=ts;
+
+  if(state.screen==='playing'&&!state.paused){
+    state.gameTime+=dt;
+
+    // Tutorial timer
+    if(state.tutorialTimer>0){
+      state.tutorialTimer-=dt;
+      if(state.tutorialTimer<=0)state.tutorialAlpha=0;
+    }
+
+    updatePlayer(dt);
+    updateFloor(dt);
+    updateCollector(dt);
+    updateHoarder();
+    updateTallMan(dt);
+    updateBlinker(dt);
+    updateKnocker(dt);
+    updateMirror(dt);
+    updateEffects(dt);
+    updateMessages(dt);
+    updateHUD();
+    render();
+  }
+
+  requestAnimationFrame(loop);
+}
+
+// ===== BUTTON WIRING =====
+$('play-btn').addEventListener('click',()=>{
+  initAudio();
+  state.version=1;
+  showRules();
+});
+$('rules-continue').addEventListener('click',startGame);
+$('retry-btn').addEventListener('click',()=>{
+  state.version=1;
+  showRules();
+});
+$('menu-btn').addEventListener('click',()=>{showScreen('menu-screen');state.screen='menu';});
+$('win-menu-btn').addEventListener('click',()=>{showScreen('menu-screen');state.screen='menu';});
+$('back-btn').addEventListener('click',()=>{
+  stopAmbience();
+  showScreen('menu-screen');
+  state.screen='menu';
+});
+
+window.addEventListener('resize',()=>{
+  if(state.screen==='playing')resizeCanvas();
+});
+
+// Start
+resizeCanvas();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
