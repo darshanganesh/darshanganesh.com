@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>FLOOR 40</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
   :root{
     --font:'Press Start 2P',monospace;
@@ -22,7 +22,7 @@
 
   /* SCREENS */
   .screen{display:none;flex-direction:column;align-items:center;gap:16px;padding:24px;max-width:600px;width:100%;text-align:center}
-  .screen.active{display:flex}
+  .screen.active{display:flex;position:relative;z-index:50}
   .screen h1{font-size:24px;color:var(--neon-red);text-shadow:0 0 20px rgba(255,26,26,0.6),0 0 40px rgba(255,26,26,0.2);letter-spacing:3px}
   .screen h2{font-size:14px;color:var(--neon-blue);text-shadow:0 0 10px rgba(0,229,255,0.4);letter-spacing:2px}
   .screen p{font-size:8px;color:var(--dim);line-height:2.2;max-width:480px}
@@ -191,7 +191,7 @@
     Learn them. Follow them.<br><br>
     Or don't.</p>
   </div>
-  <button class="btn" id="play-btn" onclick="document.getElementById('menu-screen').classList.remove('active');document.getElementById('rules-screen').classList.add('active');if(window._playClick)window._playClick();">ENTER</button>
+  <button class="btn" id="play-btn" style="position:relative;z-index:999" onclick="this.textContent='LOADING...';document.getElementById('menu-screen').classList.remove('active');document.getElementById('rules-screen').classList.add('active');if(window._playClick)window._playClick();">ENTER</button>
   <p style="margin-top:12px;font-size:6px">WASD to move &bull; E to interact &bull; C to close eyes &bull; SHIFT to sprint</p>
 </div>
 
