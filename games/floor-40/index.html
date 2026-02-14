@@ -193,7 +193,7 @@
   </div>
   <button class="btn" id="play-btn" onclick="initAudio();state.version=1;showRules()">ENTER</button>
   <p style="margin-top:12px;font-size:6px">WASD to move &bull; E to interact &bull; C to close eyes &bull; SHIFT to sprint</p>
-  <p style="font-size:5px;color:#333;margin-top:4px">build 8</p>
+  <p style="font-size:5px;color:#333;margin-top:4px">build 9</p>
 </div>
 
 <!-- RULES -->
@@ -315,7 +315,10 @@ function showScreen(id){
 let audioCtx=null;
 function initAudio(){
   if(audioCtx)return;
-  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(AC)audioCtx=new AC();
+  }catch(e){}
 }
 function playTone(freq,dur,type='sine',vol=0.08){
   if(!audioCtx)return;
