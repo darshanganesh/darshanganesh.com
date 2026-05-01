@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Who Is Fourier? Part 2 — Darshan</title>
-  <meta name="description" content="Trigonometric functions and sine waves." />
+  <meta name="description" content="Angles, theta, sine, and the wave that comes out." />
   <link rel="stylesheet" href="article.css" />
 </head>
 <body>
@@ -22,15 +22,24 @@
     <article>
       <header>
         <div class="kicker">Who Is Fourier? · Part 2</div>
-        <h1>Trigonometric Functions and Sine Waves</h1>
-        <div class="byline">By Darshan · April 23, 2026</div>
+        <h1>Angles, Theta, and Sine Waves</h1>
+        <div class="byline">By Darshan · April 30, 2026</div>
       </header>
 
+      <div class="pullquote">
+        Today I'm going to understand how angles work and sine waves.
+      </div>
+
+      <p><strong>The idea, in my own words.</strong></p>
+
       <p>
-        Trig functions. It's basically: if you take one side of the right
-        triangle, call it theta, and make it so if theta changes, the other
-        two angles change. Now, you might be saying, "Well, what's theta?"
-        It's a side of a right triangle that isn't a right side.
+        So last time we talked about the function of trigonometric functions
+        but what about the trigonometric part? It's taking an angle in a right
+        triangle and calling it theta. Now that we have theta, we relate it to
+        the ratio of two sides of the triangle. The ratio opposite over
+        hypotenuse, which looks like vertical over diagonal in the triangle
+        below, is what we call sine. When you change θ and track sine across
+        all those angles, you get a wave shape.
       </p>
 
       <figure class="stickman-fig">
@@ -52,29 +61,63 @@
           <path d="M156 168 A26 26 0 0 1 150 150" stroke="#ff2d7b" stroke-width="2.5"/>
           <text x="160" y="160" font-family="'Newsreader', Georgia, serif" font-style="italic" font-size="22" stroke="none" fill="#ff2d7b">θ</text>
         </svg>
-        <div class="caption">Fig. 2 — Meet θ.</div>
+        <div class="caption">Fig. 1 — Meet θ. The pink corner is the angle. The vertical side is opposite. The diagonal is the hypotenuse.</div>
+      </figure>
+
+      <p><strong>Worked example.</strong></p>
+
+      <p>
+        The function used for these waves is <strong>f(θ) = a · sin(θ)</strong>,
+        where <em>a</em> tells us how tall the wave gets. If <em>a</em> = 1, the
+        wave goes from 1 to negative 1. If <em>a</em> = 2, it goes from 2 to
+        negative 2. Below, I'm plugging in a few values for θ to see the wave
+        shape come out of the math.
+      </p>
+
+      <ul>
+        <li>θ = 0°, sin(θ) = 0</li>
+        <li>θ = 30°, sin(θ) = 0.5</li>
+        <li>θ = 60°, sin(θ) = 0.87</li>
+        <li>θ = 90°, sin(θ) = 1</li>
+      </ul>
+
+      <figure class="stickman-fig">
+        <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" font-family="'Newsreader', Georgia, serif">
+          <line x1="50" y1="200" x2="290" y2="200" stroke="#5a5a7a" stroke-width="1.5"/>
+          <line x1="50" y1="30" x2="50" y2="200" stroke="#5a5a7a" stroke-width="1.5"/>
+          <text x="170" y="225" font-size="11" fill="#e0e0f0" text-anchor="middle">θ (degrees)</text>
+          <text x="18" y="115" font-size="11" fill="#e0e0f0" text-anchor="middle" transform="rotate(-90, 18, 115)">sin(θ)</text>
+          <text x="50" y="215" font-size="9" fill="#5a5a7a" text-anchor="middle">0</text>
+          <text x="130" y="215" font-size="9" fill="#5a5a7a" text-anchor="middle">30</text>
+          <text x="210" y="215" font-size="9" fill="#5a5a7a" text-anchor="middle">60</text>
+          <text x="290" y="215" font-size="9" fill="#5a5a7a" text-anchor="middle">90</text>
+          <text x="42" y="203" font-size="9" fill="#5a5a7a" text-anchor="end">0</text>
+          <text x="42" y="118" font-size="9" fill="#5a5a7a" text-anchor="end">0.5</text>
+          <text x="42" y="62" font-size="9" fill="#5a5a7a" text-anchor="end">0.87</text>
+          <text x="42" y="33" font-size="9" fill="#5a5a7a" text-anchor="end">1</text>
+          <path d="M50 200 Q90 175 130 118 T210 62 T290 33" fill="none" stroke="#39ff14" stroke-width="2"/>
+          <circle cx="50" cy="200" r="3.5" fill="#ff2d7b"/>
+          <circle cx="130" cy="118" r="3.5" fill="#ff2d7b"/>
+          <circle cx="210" cy="62" r="3.5" fill="#ff2d7b"/>
+          <circle cx="290" cy="33" r="3.5" fill="#ff2d7b"/>
+          <text x="180" y="55" font-size="14" fill="#ffe600" font-style="italic">f(θ) = sin(θ)</text>
+        </svg>
+        <div class="caption">Fig. 2 — Four values of θ produce four heights. Connect them and the wave shape appears.</div>
       </figure>
 
       <p>
-        Sine waves. A sine wave, or sin, is a wave that oscillates between
-        positive and negative numbers and has a special formula.
+        This is the pattern. Pick a θ, get a height. Pick the next θ, get the
+        next height. String them together and you have a sine wave.
       </p>
 
-      <div class="pullquote">
-        f(θ) = sin θ
-      </div>
-
-      <p>
-        You can also add a number in front of sin to make the wave oscillate
-        higher than 1, -1, like so:
-      </p>
+      <p><strong>Carried question.</strong></p>
 
       <div class="pullquote">
-        f(θ) = 2 sin(θ)
+        Why does a sine wave have smooth curves and not jagged spikes?
       </div>
 
       <footer>
-        Part 2 · <a href="who-is-fourier.html">← Part 1</a> · <a href="../#notebook">all articles</a>
+        Part 2 · <a href="who-is-fourier.html">← Part 1</a> · <a href="who-is-fourier-part-3.html">Part 3 →</a> · <a href="../#notebook">all articles</a>
       </footer>
     </article>
   </div>
