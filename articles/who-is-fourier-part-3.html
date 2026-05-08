@@ -26,27 +26,56 @@
         <div class="byline">By Darshan · April 24, 2026</div>
       </header>
 
-      <p>
-        Wave addition is how you add waves: if you add however many waves that
-        oscillate however many times, it will always repeat the same shape in
-        x (the fundamental period).
-      </p>
-
       <div class="pullquote">
-        It will always repeat the same shape in x — the fundamental period.
+        Today I'm going to understand how to add waves, cosine, and a-zero.
       </div>
 
-      <p>
-        Now, cosine waves. Instead of sin θ = vertical/diagonal, cos θ =
-        horizontal/diagonal. In simple terms: instead of being on the opposite
-        side of theta, cosine is adjacent (horizontal).
-      </p>
+      <p><strong>The idea, in my own words.</strong></p>
 
       <p>
-        Finally, a₀. a₀ gives us how to not oscillate with only 0 at the
-        center. Like -2, 2, -1, 1, -5 all have a center of 0. Now we can just
-        use a₀ for pairs like 5, 1, -3, 7, 6, 2.
+        Wave addition is where you take a bunch of those lines we've been
+        talking about in the last two parts, and combine them to take parts of
+        each wave. It's like how a baby inherits half of their mom's genes and
+        half of their dad's. Cosine is basically sine's evil twin. Instead of
+        the equation being dividing the vertical and the diagonal sides of a
+        right triangle, you take horizontal and diagonal. When you make the
+        wave it looks like a sine wave but it's turned 90 degrees to the left.
+        a₀ is how you make a wave oscillate without having a center of 0.
       </p>
+
+      <p><strong>Worked example.</strong></p>
+
+      <p>Take this example:</p>
+
+      <figure class="stickman-fig">
+        <table style="margin: 0 auto; border-collapse: collapse; font-family: 'Newsreader', Georgia, serif; font-size: 16px; color: #e0e0f0;">
+          <thead>
+            <tr style="border-bottom: 1px solid #5a5a7a;">
+              <th style="padding: 10px 24px; text-align: left; font-weight: 600;">θ</th>
+              <th style="padding: 10px 24px; text-align: left; font-weight: 600;">sin(θ)</th>
+              <th style="padding: 10px 24px; text-align: left; font-weight: 600;">f(θ) = 2 + 5·sin(θ)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding: 8px 24px;">0°</td><td style="padding: 8px 24px;">0</td><td style="padding: 8px 24px;">2</td></tr>
+            <tr><td style="padding: 8px 24px;">90°</td><td style="padding: 8px 24px;">1</td><td style="padding: 8px 24px;">7</td></tr>
+            <tr><td style="padding: 8px 24px;">180°</td><td style="padding: 8px 24px;">0</td><td style="padding: 8px 24px;">2</td></tr>
+            <tr><td style="padding: 8px 24px;">270°</td><td style="padding: 8px 24px;">-1</td><td style="padding: 8px 24px;">-3</td></tr>
+            <tr><td style="padding: 8px 24px;">360°</td><td style="padding: 8px 24px;">0</td><td style="padding: 8px 24px;">2</td></tr>
+          </tbody>
+        </table>
+        <div class="caption">Fig. 1 — A wave with a₀ = 2 oscillating between 7 and -3.</div>
+      </figure>
+
+      <p>
+        As we can see, a-zero works perfectly for these types of examples.
+      </p>
+
+      <p><strong>Carried question.</strong></p>
+
+      <div class="pullquote">
+        If we can use things like a-zero, what other math tricks can we use to solve our big problem, the Fourier series?
+      </div>
 
       <footer>
         Part 3 · <a href="who-is-fourier-part-2.html">← Part 2</a> · <a href="who-is-fourier-part-4.html">Part 4 →</a> · <a href="../#notebook">all articles</a>
