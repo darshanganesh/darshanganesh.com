@@ -26,17 +26,15 @@
         <div class="byline">By Darshan · April 27, 2026</div>
       </header>
 
-      <p>
-        Last time we ended with the final parts of the Fourier series formula.
-        To wrap it up, we're going to introduce two tiny tools and a sneak peek
-        into our next Fourier item: <strong>the Fourier coefficient.</strong>
-      </p>
+      <div class="pullquote">
+        Today I'm going to understand two handy math tricks: radians and summation, plus a sneak peek into our next leg of the series, the Fourier coefficient.
+      </div>
+
+      <p><strong>The idea, in my own words.</strong></p>
 
       <p>
-        Now, our first little tool is something called summation. You might be
-        wondering, "Wait, I know sum, but what's summation?" Summation is a
-        symbol representing addition. It's called <strong>sigma</strong> in the
-        Greek alphabet and looks like a Z that got mutated.
+        Summation is basically when you want to shorten addition. You use a
+        sign called sigma, which is basically a mutated Z.
       </p>
 
       <figure class="stickman-fig">
@@ -67,50 +65,14 @@
           <path d="M250 85 Q255 76 250 68" stroke="#5a5a7a" stroke-width="1.5"/>
           <path d="M275 88 Q280 80 275 72" stroke="#5a5a7a" stroke-width="1.5"/>
         </svg>
-        <div class="caption">Fig. 3 — Z, post-experiment.</div>
+        <div class="caption">Fig. 1 — Z, post-experiment.</div>
       </figure>
 
       <p>
-        For example, <strong>A = 1 + 2 + 3 + 4 + 5 + 6 + 7</strong>. To use
-        summation for this equation, you would just put <strong>7</strong> on
-        the top, the symbol in the middle, <strong>n = 1</strong> on the
-        bottom, and <strong>n</strong> to the right — to say "substitute the
-        numbers 1 through 7 for n one after another and add them together."
-      </p>
-
-      <figure class="stickman-fig">
-        <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg" font-family="'Newsreader', Georgia, serif">
-          <defs>
-            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-              <path d="M0,0 L10,5 L0,10 Z" fill="#5a5a7a"/>
-            </marker>
-          </defs>
-          <text x="20" y="128" font-size="30" font-weight="600" fill="#e0e0f0">A =</text>
-          <text x="100" y="82" font-size="18" font-weight="600" fill="#39ff14" text-anchor="middle">7</text>
-          <text x="100" y="138" font-size="60" font-weight="600" fill="#ff2d7b" text-anchor="middle">∑</text>
-          <text x="100" y="168" font-size="14" font-weight="600" fill="#00e5ff" text-anchor="middle">n = 1</text>
-          <text x="135" y="128" font-size="30" font-weight="600" fill="#ffe600">n</text>
-          <line x1="180" y1="125" x2="220" y2="125" stroke="#5a5a7a" stroke-width="2" marker-end="url(#arrow)"/>
-          <text x="225" y="128" font-size="18" font-weight="500" fill="#e0e0f0">1+2+3+4+5+6+7</text>
-          <line x1="100" y1="195" x2="320" y2="195" stroke="#5a5a7a" stroke-width="1" stroke-dasharray="3 3"/>
-          <text x="210" y="212" font-size="14" font-weight="600" fill="#5a5a7a" text-anchor="middle">= 28</text>
-        </svg>
-        <div class="caption">Fig. 4 — Compact form on the left, expanded on the right, total below.</div>
-      </figure>
-
-      <p>
-        Now that you've learned the trick they should have taught us in 1st
-        grade, we can move on to the second tool.
-      </p>
-
-      <p><strong>Radians.</strong></p>
-
-      <p>
-        There is one more way we haven't talked about to write a Fourier series
-        formula. It's just a different way of writing <strong>omega</strong>.
-        Unlike the usual <strong>ω = 360° × f</strong> (or
-        <strong>ω = 360°/T</strong>), this one uses a new unit: a
-        <strong>radian</strong>.
+        Radians, on the other hand, are a different way of expressing 360
+        degrees, or omega. A radian is about 57.2958°, and you can fit
+        exactly 6.28 of them in a full circle. So instead of using
+        <strong>ω = 360° × 1/T</strong>, we can use <strong>ω = 2π × 1/T</strong>.
       </p>
 
       <figure class="stickman-fig">
@@ -126,73 +88,46 @@
           <text x="155" y="76" font-family="'Newsreader', Georgia, serif" font-style="italic" font-size="14" stroke="none" fill="#00e5ff">r</text>
           <text x="218" y="55" font-family="'Newsreader', Georgia, serif" font-style="italic" font-size="14" stroke="none" fill="#ff2d7b">arc = r</text>
         </svg>
-        <div class="caption">Fig. 5 — One radian: when the arc length equals the radius.</div>
+        <div class="caption">Fig. 2 — One radian: when the arc length equals the radius.</div>
       </figure>
 
-      <p>
-        One radian is about <strong>57.2958°</strong>, and about
-        <strong>6-plus-some-change</strong> radians fit into a full circle (360°).
-      </p>
+      <p><strong>Worked example.</strong></p>
 
       <p>
-        The problem is, we don't know what "some change" is. For all we know
-        it could be 1 million. Luckily for you, it isn't.
-      </p>
-
-      <p>
-        We find the exact number by dividing the <strong>circumference</strong>
-        by <strong>r</strong> (the radius). How do you do that? Simple.
-      </p>
-
-      <div class="pullquote">Circumference = diameter × 3.14</div>
-
-      <p>
-        The 3.14 is actually 3.1415... and so on. We call that number
-        <strong>pi (π).</strong>
+        Let's see how we can use summation in an example. Let's say you
+        wanted to calculate <strong>B = (x + 1) + (x + 2) + (x + 3)</strong>.
       </p>
 
       <figure class="stickman-fig">
-        <svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
-          <text x="140" y="135" font-family="'Newsreader', Georgia, serif" font-size="120" font-weight="600" fill="#ff2d7b" text-anchor="middle">π</text>
-          <text x="40" y="50" font-family="'Press Start 2P', monospace" font-size="7" fill="#5a5a7a">3.14159</text>
-          <text x="190" y="40" font-family="'Press Start 2P', monospace" font-size="7" fill="#5a5a7a">26535</text>
-          <text x="30" y="170" font-family="'Press Start 2P', monospace" font-size="7" fill="#5a5a7a">89793</text>
-          <text x="180" y="180" font-family="'Press Start 2P', monospace" font-size="7" fill="#5a5a7a">23846...</text>
-          <text x="60" y="135" font-family="'Newsreader', Georgia, serif" font-size="22" fill="#5a5a7a">≈</text>
+        <svg viewBox="0 0 380 220" xmlns="http://www.w3.org/2000/svg" font-family="'Newsreader', Georgia, serif">
+          <defs>
+            <marker id="arrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 Z" fill="#5a5a7a"/>
+            </marker>
+          </defs>
+          <text x="20" y="128" font-size="30" font-weight="600" fill="#e0e0f0">B =</text>
+          <text x="100" y="82" font-size="18" font-weight="600" fill="#39ff14" text-anchor="middle">3</text>
+          <text x="100" y="138" font-size="60" font-weight="600" fill="#ff2d7b" text-anchor="middle">∑</text>
+          <text x="100" y="168" font-size="14" font-weight="600" fill="#00e5ff" text-anchor="middle">n = 1</text>
+          <text x="155" y="128" font-size="26" font-weight="600" fill="#ffe600" text-anchor="middle">(x+n)</text>
+          <line x1="200" y1="125" x2="235" y2="125" stroke="#5a5a7a" stroke-width="2" marker-end="url(#arrow4)"/>
+          <text x="240" y="128" font-size="16" font-weight="500" fill="#e0e0f0">(x+1)+(x+2)+(x+3)</text>
+          <line x1="100" y1="195" x2="320" y2="195" stroke="#5a5a7a" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="210" y="212" font-size="14" font-weight="600" fill="#5a5a7a" text-anchor="middle">= 3x + 6</text>
         </svg>
-        <div class="caption">Fig. 6 — Pi. Goes on forever. We just say "3.14" and call it good.</div>
+        <div class="caption">Fig. 3 — Compact form on the left, expanded on the right, total below.</div>
       </figure>
 
       <p>
-        Now we plug pi in. Diameter is <strong>2r</strong>, so circumference =
-        <strong>2r × π = 2πr</strong>.
+        We can see that the sigma symbol is in the middle and everything
+        else is surrounding it.
       </p>
 
-      <p>
-        The number of radians in a full circle is circumference / r, which is
-        <strong>2πr / r = 2π</strong>.
-      </p>
+      <p><strong>Carried question.</strong></p>
 
-      <div class="pullquote">A full 360° circle = 2π radians.</div>
-
-      <p>
-        And going back to "some change" — 2π ≈ 6.28, which means "some change"
-        is actually just <strong>0.28 radians.</strong>
-      </p>
-
-      <p>
-        Now we know that a bunch of simple waves add up to a complicated wave.
-        But how do you take a complicated wave and break it down into simple
-        waves? That's where <strong>Fourier coefficients</strong> come in.
-        They primarily use area.
-      </p>
-
-      <p>
-        Three tools picked up: summation, radians, and a peek at Fourier
-        coefficients.
-      </p>
-
-      <p>Next time, we use them.</p>
+      <div class="pullquote">
+        Now that we've wrapped up everything to talk about in the Fourier series, what is the difference between our new chapter, the Fourier coefficient, and the old chapter, the Fourier series?
+      </div>
 
       <footer>
         Part 4 · <a href="who-is-fourier-part-3.html">← Part 3</a> · <a href="../#notebook">all articles</a>
