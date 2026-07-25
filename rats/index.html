@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Bringing Home Rats — A Starter Guide</title>
+<meta name="description" content="Housing, health, behavior, and food for pet rats. A guide by Brooks Estes." />
+<style>
+  :root {
+    --ground: #faf6f7;
+    --panel: #f2ecee;
+    --ink: #241f26;
+    --ink-soft: #4a4350;
+    --slate: #6f6b78;
+    --rule: #ddd3d7;
+    --accent: #b8496a;
+    --accent-soft: #f3dfe5;
+    --alarm: #a4342c;
+    --alarm-soft: #f6e3e0;
+
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+    --measure: 66ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #17141a;
+      --panel: #201c24;
+      --ink: #ece7ea;
+      --ink-soft: #c3bbc4;
+      --slate: #9a93a1;
+      --rule: #352f3a;
+      --accent: #ec8ba6;
+      --accent-soft: #3a2530;
+      --alarm: #e88d82;
+      --alarm-soft: #3a2320;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #17141a;
+    --panel: #201c24;
+    --ink: #ece7ea;
+    --ink-soft: #c3bbc4;
+    --slate: #9a93a1;
+    --rule: #352f3a;
+    --accent: #ec8ba6;
+    --accent-soft: #3a2530;
+    --alarm: #e88d82;
+    --alarm-soft: #3a2320;
+  }
+  :root[data-theme="light"] {
+    --ground: #faf6f7;
+    --panel: #f2ecee;
+    --ink: #241f26;
+    --ink-soft: #4a4350;
+    --slate: #6f6b78;
+    --rule: #ddd3d7;
+    --accent: #b8496a;
+    --accent-soft: #f3dfe5;
+    --alarm: #a4342c;
+    --alarm-soft: #f6e3e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    border-bottom: 1px solid var(--rule);
+    padding: 56px 0 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin: 0;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0;
+    max-width: 18ch;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .standfirst {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 58ch;
+    margin: 0;
+  }
+  .credit {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--slate);
+    margin: 0;
+  }
+
+  /* ---------- two-column shell ---------- */
+  .shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+    padding-top: 48px;
+  }
+  @media (min-width: 1000px) {
+    .shell { grid-template-columns: 200px minmax(0, 1fr); gap: 72px; }
+    .toc { position: sticky; top: 40px; align-self: start; }
+  }
+
+  .toc ol {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-left: 1px solid var(--rule);
+  }
+  .toc a {
+    display: block;
+    padding-left: 14px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    font-size: 14px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    line-height: 1.35;
+  }
+  .toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+
+  main { max-width: var(--measure); }
+
+  section { padding-top: 8px; margin-bottom: 60px; }
+  section h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 1.9rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 8px 0 6px;
+    text-wrap: balance;
+  }
+  section > .lede {
+    color: var(--ink-soft);
+    margin: 0 0 28px;
+    max-width: 58ch;
+  }
+  h3 {
+    font-size: 1.02rem;
+    font-weight: 650;
+    letter-spacing: -0.005em;
+    margin: 0 0 8px;
+  }
+
+  p { margin: 0 0 14px; }
+  p:last-child { margin-bottom: 0; }
+
+  ul { margin: 0; padding-left: 1.15em; }
+  li { margin-bottom: 8px; }
+  li:last-child { margin-bottom: 0; }
+  li::marker { color: var(--accent); }
+
+  /* ---------- item blocks ---------- */
+  .items {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+  .item {
+    border-left: 2px solid var(--rule);
+    padding-left: 20px;
+  }
+  .item.hazard { border-left-color: var(--alarm); }
+  .item.hazard h3 { color: var(--alarm); }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    margin-bottom: 8px;
+    background: var(--alarm-soft);
+    color: var(--alarm);
+  }
+  .tag.ok { background: var(--accent-soft); color: var(--accent); }
+
+  /* ---------- callouts ---------- */
+  .note {
+    background: var(--panel);
+    padding: 18px 20px;
+    margin: 22px 0;
+    font-size: 15.5px;
+    color: var(--ink-soft);
+  }
+  .note strong { color: var(--ink); }
+
+  /* ---------- signs list ---------- */
+  .signs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .signs li {
+    background: var(--ground);
+    margin: 0;
+    padding: 11px 16px;
+    font-size: 15.5px;
+  }
+
+  /* ---------- pro tips ---------- */
+  .tips { display: flex; flex-direction: column; gap: 18px; margin-top: 8px; }
+  .tip { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; }
+  .tip .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    padding-top: 4px;
+  }
+
+  /* ---------- footer ---------- */
+  .disclaimer {
+    border-top: 1px solid var(--rule);
+    margin-top: 72px;
+    padding-top: 24px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    max-width: 58ch;
+  }
+
+  .thanks {
+    margin-top: 32px;
+    padding: 20px 22px;
+    background: var(--accent-soft);
+    font-size: 15.5px;
+    color: var(--ink-soft);
+    max-width: 58ch;
+  }
+  .thanks strong { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Starter guide · Domestic rats</p>
+    <h1>Everything to settle before the <em>rats</em> come home</h1>
+    <p class="standfirst">Housing, health, behavior, and food — the decisions that are hard to undo once there are animals in the cage. Read the hazards first; they are the ones that cause real injury.</p>
+    <p class="credit">Written by Brooks Estes · Tiny Snoots Rat Rescue</p>
+  </header>
+
+  <div class="shell">
+
+    <nav class="toc" aria-label="Contents">
+      <p class="eyebrow">Contents</p>
+      <ol>
+        <li><a href="#safety">Big safety things</a></li>
+        <li><a href="#cage">The cage</a></li>
+        <li><a href="#health">Health</a></li>
+        <li><a href="#behavior">Behavior</a></li>
+        <li><a href="#sex">Choosing a sex</a></li>
+        <li><a href="#social">Socializing</a></li>
+        <li><a href="#food">Food</a></li>
+        <li><a href="#more">Where to read more</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <section id="safety">
+        <p class="eyebrow">01 — Non-negotiable</p>
+        <h2>Big safety things</h2>
+        <p class="lede">Four common pet-store products cause most preventable injuries in pet rats. Rule these out before you shop for anything else.</p>
+
+        <div class="items">
+
+          <div class="item hazard">
+            <span class="tag">Avoid</span>
+            <h3>Bare wire wheels</h3>
+            <ul>
+              <li>No crossbar — rats easily catch their tails and are severely injured.</li>
+              <li>Running surface must be plastic, or plastic-coated.</li>
+              <li>At least 16&Prime; in diameter. Yes, this is big — big enough for your largest rat to run with their back flat.</li>
+              <li>Good wheels are available from exotic pet stores, or even Etsy.</li>
+            </ul>
+          </div>
+
+          <div class="item hazard">
+            <span class="tag">Avoid</span>
+            <h3>Exposed wire floors</h3>
+            <p>Rats are susceptible to a condition called <strong>bumblefoot</strong>. Too much walking on wire surfaces causes sores and calluses that deform the feet and are prone to infection. Eliminate wire flooring, or limit it severely.</p>
+          </div>
+
+          <div class="item hazard">
+            <span class="tag">Avoid</span>
+            <h3>Wood shavings and corncob bedding</h3>
+            <ul>
+              <li>Wood shavings don't absorb urine and can contain substances harmful to rats. Aspen shavings are the exception — only from a reputable brand such as Carefresh or Kaytee.</li>
+              <li>Corncob is prone to growing mold and fungi.</li>
+              <li>Look for bedding labeled &ldquo;dust-free,&rdquo; &ldquo;dust-removed,&rdquo; or similar. Rats have extremely sensitive respiratory systems and react to small particulates and strong fragrances.</li>
+            </ul>
+            <div class="note">
+              <strong>Why research facilities use corncob anyway:</strong> it can be autoclaved or irradiated, which kills spores and pathogens. That isn't possible at home.
+            </div>
+          </div>
+
+          <div class="item">
+            <span class="tag ok">Do this</span>
+            <h3>Corner litter boxes</h3>
+            <p>Most rats can be litter trained, so corner litter boxes are a good idea. Double-check the dimensions if ordering online — product images can be deceptive.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="cage">
+        <p class="eyebrow">02 — Housing</p>
+        <h2>A well-ventilated cage, with shelves and ramps</h2>
+        <p class="lede">Aquariums are terrible for rats, and most rodents, because the air can't circulate.</p>
+
+        <h3>What to look for</h3>
+        <ul>
+          <li>Powder-coated metal, with at least two shelves.</li>
+          <li>Bars no more than about &frac12;&Prime; apart.</li>
+          <li>Bigger is better, within reason — but each rat should have at least 1.5&ndash;2&nbsp;ft&sup3;.</li>
+          <li>A drop-in design or plastic pull-out tray is ideal, since it reduces the amount of wire surface.</li>
+          <li>Second-hand cages can be a great deal — just disinfect thoroughly before use.</li>
+        </ul>
+
+        <h3>Soft furnishings</h3>
+        <ul>
+          <li>Cover most horizontal surfaces with smooth fabric liners, like fleece.</li>
+          <li>Avoid loopy fabrics such as towels — toenails get caught in the loops.</li>
+          <li>There are a <em>ton</em> of great Etsy shops selling fleece hammocks, shelf covers, and beds in any shape and size.</li>
+          <li>Wash any new bedding before using it.</li>
+          <li>Items marketed for ferrets, or even birds, are often great for rats too.</li>
+        </ul>
+
+        <div class="note">
+          <strong>Critter Nation makes excellent cages.</strong> The single story is adequate for 2 large or 3 small rats, with hanging beds and hammocks. The double is better, but more expensive — <a href="https://www.midwesthomes4pets.com/product/small-animal/habitats-cages/critter-nation/">see the range at Midwest Homes for Pets</a>.
+        </div>
+      </section>
+
+      <section id="health">
+        <p class="eyebrow">03 — Health</p>
+        <h2>What to watch for, and who to call</h2>
+
+        <h3>Every rat carries mycoplasma</h3>
+        <p>All rats carry a bacterium called mycoplasma — &ldquo;myco&rdquo; for short. Most strains of lab rats do not, but are likely to acquire it after leaving the controlled research facility.</p>
+        <ul>
+          <li>For well-bred rats it may never be a problem. In unhealthy conditions it presents itself, usually as a respiratory infection.</li>
+          <li>Any change in respiration — labored breathing, rattling, crackling, clicking, excessive sneezing — should be looked at by a vet.</li>
+          <li>Adopting from a responsible breeder (or a lab) is the best, though not guaranteed, way to avoid it.</li>
+          <li>It is <strong>highly communicable</strong>. Don't interact with rats at pet stores, no ratty play-dates with friends' rats, and wash your hands after handling any other rodent even if it seems perfectly healthy.</li>
+        </ul>
+        <p><a href="http://ratguide.com/health/bacteria/mycoplasma_mycoplasmosis.php">Rat Guide has an excellent article on mycoplasmosis.</a></p>
+
+        <h3>Porphyrin</h3>
+        <p>Rats secrete a reddish substance called porphyrin from their eyes and nose. Occasional discharge is normal. Excessive build-up can signal illness or stress — particularly when it's dried and crusty.</p>
+
+        <h3>Rats are very good at hiding illness</h3>
+        <p>Signs worth acting on:</p>
+        <ul class="signs">
+          <li>Hunched posture</li>
+          <li>Sudden changes in weight</li>
+          <li>Lumps, bumps, scabs, hair loss</li>
+          <li>Squinting, pinned ears, other changes in facial expression</li>
+          <li>Hind leg weakness</li>
+        </ul>
+
+        <h3>Hind leg degeneration</h3>
+        <ul>
+          <li>Rats, particularly males, can be prone to hind leg degeneration (HLD) as they age.</li>
+          <li>A <em>sudden</em> loss of function is likely due to trauma and should be treated immediately.</li>
+          <li><em>Gradual</em> onset is not generally painful, and many rats adapt just fine. Discuss with your vet how to keep them comfortable and how to assess quality of life.</li>
+        </ul>
+
+        <div class="note">
+          <strong>Find the vet before you get the rats.</strong> Most regular clinics won't see rats, and even those that do often aren't versed in the most up-to-date treatments. Find a good exotic vet in your area early — they book out far in advance, and even the best-kept animals will need a visit for something in their lifetime.
+        </div>
+      </section>
+
+      <section id="behavior">
+        <p class="eyebrow">04 — Behavior</p>
+        <h2>Bruxing, boggling, and biting</h2>
+        <ul>
+          <li>Rats have a polyphasic sleep cycle — multiple periods of sleep and wakefulness — but are most active at night.</li>
+          <li>When happy, rats grind their teeth. This is called <strong>bruxing</strong>. It can occasionally signal stress, but is usually positive.</li>
+          <li>Because of the anatomy of their skulls, bruxing sometimes makes their eyes bulge in and out — <strong>boggling</strong>. It looks alarming and is perfectly normal, a sign of contentment.</li>
+          <li>Rats rarely bite, and almost never out of aggression. Set them up for success: wash your hands after touching food, and keep your fingers out of the way when offering treats.</li>
+        </ul>
+      </section>
+
+      <section id="sex">
+        <p class="eyebrow">05 — Before you adopt</p>
+        <h2>Choosing a sex</h2>
+        <p class="lede">Every rat is different, but some tendencies hold.</p>
+        <ul>
+          <li>Males tend to be calmer and more affectionate toward humans; females tend to be more playful.</li>
+          <li>Unneutered males are not typically more aggressive toward each other — unlike mice — as long as there are no females around.</li>
+          <li>Males develop a musky smell and are more prone to scent marking than females.</li>
+          <li>They can also develop a yellowish, greasy build-up on their backs called <strong>buck grease</strong>. It doesn't smell and is harmless.</li>
+        </ul>
+
+        <h3>Neutering and spaying</h3>
+        <ul>
+          <li>Neutering rats carries minimal risk with the proper vet.</li>
+          <li>Preemptively spaying females is less common. It reduces the risk of mammary tumors and other hormone-related problems, but is higher-risk and more invasive than neutering.</li>
+          <li>There is also an implant that chemically sterilizes rats — less invasive and less expensive, but not permanent.</li>
+          <li>Discuss the options with your vet.</li>
+        </ul>
+
+        <div class="note">
+          <strong>A note on tumors:</strong> while not nearly as at-risk as females, male rats are more prone to mammary tumors than males of other species — mammary tissue on rodents is extensive. Obesity significantly increases the risk.
+        </div>
+      </section>
+
+      <section id="social">
+        <p class="eyebrow">06 — Socializing</p>
+        <h2>Rats should always be in same-sex groups</h2>
+        <p>They are social animals. No matter how much you interact with them, you can never come close to the constant companionship of another rat.</p>
+      </section>
+
+      <section id="food">
+        <p class="eyebrow">07 — Food</p>
+        <h2>Pellets first, fresh food alongside</h2>
+        <ul>
+          <li>Oxbow and Mazuri make the best pelleted foods available. Other good brands exist — research them to be sure they're nutritionally balanced and safely manufactured.</li>
+          <li>Rats should also get some fresh fruit and vegetables.</li>
+          <li>Some rats hoard food. If yours do, watch for fresh food going bad or attracting fruit flies.</li>
+          <li>It's usually best not to let adult rats (6+ months) free-feed, to reduce the risk of obesity.</li>
+        </ul>
+
+        <h3>What they can and can't eat</h3>
+        <p>Rats can eat most of the same things humans can — and the same things are bad for them in excess, like sugar and fat — with a few exceptions.</p>
+        <ul>
+          <li>A long-repeated &ldquo;fact&rdquo; holds that male rats have trouble with fruits containing D-limonene (citrus, mangos). Current information is spotty and conflicting; avoiding the peels and keeping amounts small is likely fine, but be cautious.</li>
+          <li>Certain seeds and pits are toxic to rats.</li>
+          <li><a href="https://ratguide.com/care/figures-care/diet-figure-2-daily-menu.php">Rat Guide's daily menu figure</a> is an excellent reference.</li>
+        </ul>
+
+        <h3>Three pro tips</h3>
+        <div class="tips">
+          <div class="tip">
+            <span class="num">01</span>
+            <div>
+              <p>Unlike dogs and cats, rats can have <strong>cooked bones</strong> — their jaws aren't strong enough to create dangerous splinters. As long as there's minimal meat left, give leftover bones to your ratties. The bits of meat and marrow are a good source of nutrients, and it encourages healthy chewing. Put them in clean, empty cardboard boxes so the rats really have to work for it.</p>
+            </div>
+          </div>
+          <div class="tip">
+            <span class="num">02</span>
+            <div>
+              <p>Leftover <strong>corn on the cob</strong> makes a great treat — just rinse off any excess salt or sauce.</p>
+            </div>
+          </div>
+          <div class="tip">
+            <span class="num">03</span>
+            <div>
+              <p><strong>Strawberry tops and apple cores</strong>, with the seeds removed, are also excellent treats.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="more">
+        <p class="eyebrow">08 — Reference</p>
+        <h2>Where to read more</h2>
+        <ul>
+          <li><a href="http://ratguide.com/health/">The Rat Health Guide</a> — a phenomenal resource.</li>
+          <li><a href="http://www.afrma.org/">The American Fancy Rat and Mouse Association.</a></li>
+        </ul>
+
+        <p class="disclaimer">Don't take any advice online at face value. Do your own research, and always consult an exotic vet for the most reliable guidance.</p>
+
+        <p class="thanks">This guide was written by <strong>Brooks Estes</strong>, who sent it to me as a PDF. I put it on the web as a thank you. All the knowledge here is theirs; I only did the typesetting.</p>
+      </section>
+
+    </main>
+  </div>
+</div>
+</body>
+</html>
