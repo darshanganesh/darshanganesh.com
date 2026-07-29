@@ -221,21 +221,41 @@ const TAU=Math.PI*2;
    must still respond and the failure must be visible on screen instead of
    leaving a dead-looking title card.
    ═══════════════════════════════════════════════════════════════════════ */
-function showFatal(msg){
-  const box=$('err');
-  box.innerHTML='THE GAME FAILED TO START.<br><br><span style="color:#8e1c1c;font-size:12px">'+
-    String(msg).replace(/[<>]/g,'')+'</span><br><br>Reload to try again.';
-  box.style.display='flex';
+// BOOT tracks how far startup got, so a failure names the stage that broke
+// instead of leaving us to guess. Only the FIRST failure is ever displayed —
+// later cascading errors must not overwrite the root cause.
+let BOOT='loading 3d engine';
+let bootFailed=false;
+function showFatal(msg,e){
+  if(bootFailed)return;
+  bootFailed=true;
+  const where=e&&e.stack?String(e.stack).split('\n')[1]||'':'';
+  $('err').innerHTML='THE GAME FAILED TO START.'+
+    '<br><br><span style="color:#8e1c1c;font-size:13px">'+String(msg).replace(/[<>]/g,'')+'</span>'+
+    '<br><br><span style="font-size:11px;color:#6d675e">stage: '+BOOT+
+    (where?'<br>'+where.trim().replace(/[<>]/g,''):'')+'</span>'+
+    '<br><br>Reload to try again.';
+  $('err').style.display='flex';
 }
-addEventListener('error',ev=>showFatal(ev.message+'  ('+String(ev.filename||'').split('/').pop()+':'+ev.lineno+')'));
-addEventListener('unhandledrejection',ev=>showFatal(ev.reason&&ev.reason.message||ev.reason));
+addEventListener('error',ev=>showFatal(ev.message,ev.error));
+addEventListener('unhandledrejection',ev=>showFatal((ev.reason&&ev.reason.message)||ev.reason,ev.reason));
 
+// If startup never finished, say so plainly rather than letting a click throw a
+// confusing downstream error over the top of the real one.
+function bootReady(){
+  if(BOOT==='ready')return true;
+  showFatal('Startup never finished, so the game cannot begin.');
+  $('err').style.display='flex';
+  return false;
+}
 $('startBtn').onclick=()=>{
+  if(!bootReady())return;
   try{ initAudio(); }catch(e){ /* audio is optional — never block the game on it */ }
   $('title').classList.remove('on');
   $('rules').classList.add('on');
 };
 $('goBtn').onclick=()=>{
+  if(!bootReady())return;
   try{
     initAudio();
     $('rules').classList.remove('on');
@@ -247,6 +267,7 @@ $('goBtn').onclick=()=>{
   }catch(e){ showFatal(e.message||e); }
 };
 $('againBtn').onclick=()=>{
+  if(!bootReady())return;
   try{
     $('over').classList.remove('on');
     resetGame();
@@ -453,6 +474,7 @@ const SFX={
 /* ═══════════════════════════════════════════════════════════════════════
    3. RENDERER / SCENE / POST-PROCESS
    ═══════════════════════════════════════════════════════════════════════ */
+BOOT='creating webgl renderer';
 let renderer;
 try{ renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'}); }
 catch(e){ showFatal('This browser could not start WebGL, which the 3D engine needs. '+(e.message||'')); throw e; }
@@ -465,6 +487,7 @@ renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 document.body.appendChild(renderer.domElement);
 
+BOOT='building scene';
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x000000);
 scene.fog=new THREE.FogExp2(0x05060a,0.075);
@@ -489,6 +512,7 @@ camera.add(torchTarget);torch.target=torchTarget;
 // soft fill right at the player so you can see your hands
 const torchFill=new THREE.PointLight(0xffe0b0,0,4.5,2);camera.add(torchFill);
 
+BOOT='setting up post-processing';
 // ---- post-process: render to target, draw through a grade/warp shader
 let rt=new THREE.WebGLRenderTarget(innerWidth,innerHeight,{samples:0});
 const postScene=new THREE.Scene();
@@ -546,6 +570,7 @@ addEventListener('resize',()=>{
 /* ═══════════════════════════════════════════════════════════════════════
    4. LEVEL GENERATION — 4 floors of grid rooms + corridors
    ═══════════════════════════════════════════════════════════════════════ */
+BOOT='level definitions';
 const CELL=3.6, WALL_H=3.3, GW=27, GH=27;
 
 const FLOORS=[
@@ -801,6 +826,7 @@ function limbChain(upper,lower,r,mat){
   a.userData.knee=b;return a;
 }
 
+BOOT='monster definitions';
 const MONSTER_DEFS={
   skinless:{ hp:70, speed:4.6, dmg:16, reach:1.5, sanity:5.5, name:'THE SKINLESS' },
   weeping:{  hp:Infinity, speed:1.5, dmg:34, reach:1.7, sanity:7.5, name:'THE WOMAN IN WHITE' },
@@ -951,6 +977,7 @@ const BUILDERS={skinless:buildSkinless,weeping:buildWeeping,listener:buildListen
 /* ═══════════════════════════════════════════════════════════════════════
    7. GAME STATE
    ═══════════════════════════════════════════════════════════════════════ */
+BOOT='game state';
 const G={
   running:false,started:false,paused:false,over:false,
   floorIdx:0, floors:[], world:null,
@@ -1281,6 +1308,7 @@ document.addEventListener('pointerlockchange',()=>{
 });
 
 /* ---- viewmodel: hands, flashlight body, knife ---- */
+BOOT='player viewmodel';
 const viewmodel=new THREE.Group();camera.add(viewmodel);
 const handMat=new THREE.MeshStandardMaterial({color:0xb08a70,roughness:.8});
 const vmTorch=new THREE.Group();
@@ -2071,6 +2099,7 @@ function updateAtmosphere(dt){
 /* ═══════════════════════════════════════════════════════════════════════
    16. MAIN LOOP
    ═══════════════════════════════════════════════════════════════════════ */
+BOOT='main loop';
 let last=performance.now();
 function frame(now){
   requestAnimationFrame(frame);
@@ -2116,6 +2145,7 @@ requestAnimationFrame(frame);
 /* ═══════════════════════════════════════════════════════════════════════
    17. BOOT / RESET
    ═══════════════════════════════════════════════════════════════════════ */
+BOOT='drawing textures';
 try{
   buildTextures();
   buildMaterials();
@@ -2144,6 +2174,7 @@ function resetGame(){
 
 // Menu handlers are bound at the top of this file (section 0b), before any
 // engine setup that could throw and orphan them.
+BOOT='ready';
 </script>
 </body>
 </html>
