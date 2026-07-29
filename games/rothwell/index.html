@@ -226,15 +226,15 @@ const TAU=Math.PI*2;
 // later cascading errors must not overwrite the root cause.
 let BOOT='loading 3d engine';
 let bootFailed=false;
-function showFatal(msg,e){
+function showFatal(msg,e,help){
   if(bootFailed)return;
   bootFailed=true;
   const where=e&&e.stack?String(e.stack).split('\n')[1]||'':'';
   $('err').innerHTML='THE GAME FAILED TO START.'+
     '<br><br><span style="color:#8e1c1c;font-size:13px">'+String(msg).replace(/[<>]/g,'')+'</span>'+
+    (help?'<div style="margin:22px auto 0;max-width:520px;text-align:left;font-size:12px;line-height:1.9;color:#a49c90">'+help+'</div>':'')+
     '<br><br><span style="font-size:11px;color:#6d675e">stage: '+BOOT+
-    (where?'<br>'+where.trim().replace(/[<>]/g,''):'')+'</span>'+
-    '<br><br>Reload to try again.';
+    (where?'<br>'+where.trim().replace(/[<>]/g,''):'')+'</span>';
   $('err').style.display='flex';
 }
 addEventListener('error',ev=>showFatal(ev.message,ev.error));
@@ -476,8 +476,32 @@ const SFX={
    ═══════════════════════════════════════════════════════════════════════ */
 BOOT='creating webgl renderer';
 let renderer;
-try{ renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'}); }
-catch(e){ showFatal('This browser could not start WebGL, which the 3D engine needs. '+(e.message||'')); throw e; }
+{
+  // Ask for the context ourselves so we can tell "WebGL is switched off" apart
+  // from "WebGL works but the engine failed" — they need very different advice.
+  const canvas=document.createElement('canvas');
+  const attrs={alpha:true,depth:true,stencil:true,antialias:false,premultipliedAlpha:true,powerPreference:'high-performance'};
+  let gl=null;
+  for(const n of ['webgl2','webgl','experimental-webgl']){
+    try{ gl=canvas.getContext(n,attrs)||canvas.getContext(n); }catch(e){}
+    if(gl)break;
+  }
+  if(!gl){
+    const safari=/^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+    showFatal('This browser will not hand out WebGL, which the 3D engine needs.',null,
+      (safari?'<b style="color:#c9c2b4">Most likely: Safari Lockdown Mode.</b> It turns WebGL off deliberately. '+
+        'You can leave it on everywhere else and allow just this page:<br>'+
+        '· Mac: with this page open, <b>Safari</b> menu → <b>Settings for This Website…</b> → untick <b>Lockdown Mode</b><br>'+
+        '· iPhone / iPad: tap <b>aA</b> in the address bar → <b>Website Settings</b> → turn <b>Lockdown Mode</b> off<br><br>'+
+        'Otherwise:<br>':'')+
+      '· Chrome: Settings → System → turn on <b>Use graphics acceleration when available</b>, then restart Chrome<br>'+
+      '· Try <b>get.webgl.org</b> — if that page fails too, it is the browser, not this game<br>'+
+      '· Close other 3D or video tabs, then reload');
+    throw new Error('WebGL unavailable');
+  }
+  try{ renderer=new THREE.WebGLRenderer({canvas,context:gl,antialias:false}); }
+  catch(e){ showFatal('WebGL started, but the 3D engine could not use it. '+(e.message||''),e); throw e; }
+}
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 renderer.setSize(innerWidth,innerHeight);
 renderer.outputColorSpace=THREE.SRGBColorSpace;
