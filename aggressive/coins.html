@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coins · Aggressive Algo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <span class="nav-title">AGGRESSIVE ALGO</span>
+    <div class="nav-links">
+      <a href="index.html">Overview</a>
+      <a href="coins.html" class="active">Coins</a>
+      <a href="profits.html">P&L</a>
+    </div>
+  </div>
+</nav>
+<main>
+  <h1>Individual Coins</h1>
+  <p class="sub" id="meta"></p>
+  <div id="coin-cards"></div>
+  <p class="foot">Paper money only. No real funds. Built by Darshan Ganesh.</p>
+</main>
+<script src="app.js"></script>
+<script>
+loadData(d => {
+  document.getElementById("meta").textContent = `Day ${d.day} · Updated ${d.updated}`;
+  const colors = {SOL:"#a371f7",AVAX:"#f85149",LINK:"#58a6ff",DOT:"#f0883e",DOGE:"#d2a8ff"};
+
+  document.getElementById("coin-cards").innerHTML = d.coins.map(c => {
+    const col = colors[c.name] || "#58a6ff";
+    const gain = c.entry_price > 0 ? ((c.price / c.entry_price - 1) * 100) : 0;
+    const statusCls = c.status==="HOLDING"?"tag-hold":c.status==="WATCHING"?"tag-watch":"tag-scan";
+
+    return `<div class="coin-card" style="border-top:3px solid ${col}">
+      <div class="coin-header">
+        <div>
+          <span class="coin-name">${c.name}</span>
+          <span class="${statusCls}">${c.status}${c.status==="WATCHING"?" D"+c.days_watched+"/20":""}</span>
+        </div>
+        <span class="coin-score" style="color:${scoreColor(c.conviction)}">${c.conviction}/100</span>
+      </div>
+
+      <div class="coin-price">${fmt$(c.price,2)}</div>
+
+      <div class="indicators">
+        <div class="ind"><span class="ind-label">RSI</span><span class="ind-val">${c.rsi.toFixed(0)}</span></div>
+        <div class="ind"><span class="ind-label">BB Width</span><span class="ind-val">${c.bb_bandwidth}%</span></div>
+        <div class="ind"><span class="ind-label">Squeeze</span><span class="ind-val">${c.squeeze?"YES":"No"}</span></div>
+        <div class="ind"><span class="ind-label">EMA Stack</span><span class="ind-val">${c.ema_aligned?"YES":"No"}</span></div>
+      </div>
+
+      ${c.coin_held > 0 ? `
+      <div class="position-info">
+        <div class="pos-row"><span>Position</span><b>${c.position}</b></div>
+        <div class="pos-row"><span>Entry</span><b>${fmt$(c.entry_price,2)}</b></div>
+        <div class="pos-row"><span>Current</span><b>${fmt$(c.price,2)}</b></div>
+        <div class="pos-row"><span>P&L</span><b class="${gain>=0?'up':'down'}">${gain>=0?"+":""}${gain.toFixed(2)}% (${fmt$(c.unrealized_pnl,2)})</b></div>
+        <div class="pos-row"><span>Value</span><b>${fmt$(c.value,2)}</b></div>
+        <div class="pos-row"><span>Stop</span><b>${fmt$(c.stop,2)}</b></div>
+        <div class="pos-row"><span>Profit taken</span><b>${c.partial_taken?"30% locked":"Not yet"}</b></div>
+      </div>` : `
+      <div class="position-info empty">
+        <div class="pos-row"><span>Position</span><b>CASH</b></div>
+        <div class="pos-row"><span>Watching since</span><b>${c.status==="WATCHING"?"Day "+c.days_watched:"--"}</b></div>
+      </div>`}
+
+      <div class="coin-footer">
+        <span>Trades: ${c.trades}</span>
+        <span>Realized: <span class="${c.realized_pnl>=0?'up':'down'}">${fmt$(c.realized_pnl,2)}</span></span>
+      </div>
+    </div>`;
+  }).join("");
+});
+</script>
+</body>
+</html>

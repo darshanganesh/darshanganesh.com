@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aggressive Algo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <span class="nav-title">AGGRESSIVE ALGO</span>
+    <div class="nav-links">
+      <a href="index.html" class="active">Overview</a>
+      <a href="coins.html">Coins</a>
+      <a href="profits.html">P&L</a>
+    </div>
+  </div>
+</nav>
+<main>
+  <div class="hero" id="hero"></div>
+  <div class="grid-3" id="stats"></div>
+  <div class="section">
+    <h2>Conviction Scanner</h2>
+    <p class="sub">Real-time signal scores across all tracked coins. Watch threshold: 45 | Entry threshold: 55 after 20-day window.</p>
+    <table id="scanner">
+      <thead><tr><th>Coin</th><th>Price</th><th>Score</th><th>RSI</th><th>BB Width</th><th>Squeeze</th><th>EMA Stack</th><th>Status</th></tr></thead>
+      <tbody id="scanner-body"></tbody>
+    </table>
+  </div>
+  <div class="section">
+    <h2>Equity Curve</h2>
+    <svg id="svg" viewBox="0 0 760 200" preserveAspectRatio="none"></svg>
+  </div>
+  <div class="section">
+    <h2>Strategy</h2>
+    <div class="rules">
+      <div class="rule"><b>Signal stacking:</b> EMA alignment, Bollinger squeeze/breakout, RSI mean reversion, volume spikes, momentum acceleration. Each adds to a conviction score (0-100).</div>
+      <div class="rule"><b>20-day window:</b> When score crosses 45, start watching. After 20 days, if score >= 55, enter aggressively.</div>
+      <div class="rule"><b>Position sizing:</b> 15-30% of capital per coin, scaled by conviction. Higher score = bigger bet.</div>
+      <div class="rule"><b>Risk:</b> 8% trailing stop. Take 30% profit at +10%. Exit if conviction drops to 0.</div>
+    </div>
+  </div>
+  <p class="foot">Paper money only. No real funds. Built by Darshan Ganesh.</p>
+</main>
+<script src="app.js"></script>
+<script>
+loadData(d => {
+  document.getElementById("hero").innerHTML = `
+    <div class="hero-equity">${fmt$(d.equity)}</div>
+    <div class="hero-ret ${d.ret_pct>=0?'up':'down'}">${pct(d.ret_pct)} since day 1</div>
+    <div class="hero-meta">Day ${d.day} · Updated ${d.updated}</div>`;
+
+  document.getElementById("stats").innerHTML = `
+    <div class="stat-card"><div class="stat-label">Cash Available</div><div class="stat-val">${fmt$(d.cash)}</div></div>
+    <div class="stat-card"><div class="stat-label">Positions Open</div><div class="stat-val">${d.coins.filter(c=>c.coin_held>0).length} / ${d.coins.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Total Trades</div><div class="stat-val">${d.coins.reduce((a,c)=>a+c.trades,0)}</div></div>`;
+
+  const tb = document.getElementById("scanner-body");
+  tb.innerHTML = d.coins.map(c => {
+    const bar = `<div class="score-bar"><div class="score-fill" style="width:${c.conviction}%;background:${scoreColor(c.conviction)}"></div></div>`;
+    const statusCls = c.status==="HOLDING"?"tag-hold":c.status==="WATCHING"?"tag-watch":"tag-scan";
+    const watchInfo = c.status==="WATCHING" ? ` D${c.days_watched}/20` : "";
+    return `<tr>
+      <td><b>${c.name}</b></td>
+      <td class="mono">${fmt$(c.price,2)}</td>
+      <td>${bar}<span class="mono">${c.conviction}</span></td>
+      <td class="mono">${c.rsi.toFixed(0)}</td>
+      <td class="mono">${c.bb_bandwidth}%</td>
+      <td>${c.squeeze?'<span class="tag-squeeze">SQUEEZE</span>':'--'}</td>
+      <td>${c.ema_aligned?'<span class="tag-ema">ALIGNED</span>':'--'}</td>
+      <td><span class="${statusCls}">${c.status}${watchInfo}</span></td>
+    </tr>`;
+  }).join("");
+
+  drawEquityCurve(d.history, "svg");
+});
+</script>
+</body>
+</html>

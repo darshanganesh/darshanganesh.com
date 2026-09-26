@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P&L · Aggressive Algo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <span class="nav-title">AGGRESSIVE ALGO</span>
+    <div class="nav-links">
+      <a href="index.html">Overview</a>
+      <a href="coins.html">Coins</a>
+      <a href="profits.html" class="active">P&L</a>
+    </div>
+  </div>
+</nav>
+<main>
+  <h1>Profit & Loss</h1>
+  <p class="sub" id="meta"></p>
+
+  <div class="grid-3" id="pnl-summary"></div>
+
+  <div class="section">
+    <h2>Breakdown by Coin</h2>
+    <table>
+      <thead><tr><th>Coin</th><th>Status</th><th>Unrealized</th><th>Realized</th><th>Net P&L</th><th>Trades</th></tr></thead>
+      <tbody id="pnl-body"></tbody>
+      <tfoot id="pnl-foot"></tfoot>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Capital Allocation</h2>
+    <div id="alloc"></div>
+  </div>
+
+  <div class="section">
+    <h2>Daily Returns</h2>
+    <table>
+      <thead><tr><th>Day</th><th>Date</th><th>Equity</th><th>Return</th><th>Positions</th><th>Cash</th></tr></thead>
+      <tbody id="daily-body"></tbody>
+    </table>
+  </div>
+
+  <p class="foot">Paper money only. No real funds. Built by Darshan Ganesh.</p>
+</main>
+<script src="app.js"></script>
+<script>
+loadData(d => {
+  document.getElementById("meta").textContent = `Day ${d.day} · Updated ${d.updated}`;
+
+  document.getElementById("pnl-summary").innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Gross P&L</div>
+      <div class="stat-val ${d.gross_pnl>=0?'up':'down'}">${fmt$(d.gross_pnl,2)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Realized P&L</div>
+      <div class="stat-val ${d.realized_pnl>=0?'up':'down'}">${fmt$(d.realized_pnl,2)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Unrealized P&L</div>
+      <div class="stat-val ${d.unrealized_pnl>=0?'up':'down'}">${fmt$(d.unrealized_pnl,2)}</div>
+    </div>`;
+
+  const tbody = document.getElementById("pnl-body");
+  let totU=0, totR=0, totT=0;
+  tbody.innerHTML = d.coins.map(c => {
+    const net = c.unrealized_pnl + c.realized_pnl;
+    totU += c.unrealized_pnl; totR += c.realized_pnl; totT += c.trades;
+    const statusCls = c.status==="HOLDING"?"tag-hold":c.status==="WATCHING"?"tag-watch":"tag-scan";
+    return `<tr>
+      <td><b>${c.name}</b></td>
+      <td><span class="${statusCls}">${c.status}</span></td>
+      <td class="${c.unrealized_pnl>=0?'up':'down'} mono">${fmt$(c.unrealized_pnl,2)}</td>
+      <td class="${c.realized_pnl>=0?'up':'down'} mono">${fmt$(c.realized_pnl,2)}</td>
+      <td class="${net>=0?'up':'down'} mono"><b>${fmt$(net,2)}</b></td>
+      <td class="mono">${c.trades}</td>
+    </tr>`;
+  }).join("");
+  const totNet = totU + totR;
+  document.getElementById("pnl-foot").innerHTML = `<tr style="border-top:2px solid var(--border)">
+    <td colspan="2"><b>TOTAL</b></td>
+    <td class="${totU>=0?'up':'down'} mono"><b>${fmt$(totU,2)}</b></td>
+    <td class="${totR>=0?'up':'down'} mono"><b>${fmt$(totR,2)}</b></td>
+    <td class="${totNet>=0?'up':'down'} mono"><b>${fmt$(totNet,2)}</b></td>
+    <td class="mono"><b>${totT}</b></td>
+  </tr>`;
+
+  // Allocation bar
+  const invested = d.coins.reduce((a,c) => a + c.value, 0);
+  const total = d.cash + invested;
+  const colors = {SOL:"#a371f7",AVAX:"#f85149",LINK:"#58a6ff",DOT:"#f0883e",DOGE:"#d2a8ff"};
+  let allocHTML = '<div class="alloc-bar">';
+  d.coins.forEach(c => {
+    if (c.value > 0) {
+      const w = (c.value / total * 100).toFixed(1);
+      allocHTML += `<div class="alloc-seg" style="width:${w}%;background:${colors[c.name]||'#58a6ff'}" title="${c.name}: ${w}%"></div>`;
+    }
+  });
+  const cashW = (d.cash / total * 100).toFixed(1);
+  allocHTML += `<div class="alloc-seg alloc-cash" style="width:${cashW}%" title="Cash: ${cashW}%"></div>`;
+  allocHTML += '</div><div class="alloc-legend">';
+  d.coins.forEach(c => {
+    if (c.value > 0) allocHTML += `<span><span class="ldot" style="background:${colors[c.name]}"></span>${c.name} ${(c.value/total*100).toFixed(1)}%</span>`;
+  });
+  allocHTML += `<span><span class="ldot" style="background:var(--muted)"></span>Cash ${cashW}%</span></div>`;
+  document.getElementById("alloc").innerHTML = allocHTML;
+
+  // Daily returns
+  document.getElementById("daily-body").innerHTML = d.history.slice().reverse().map(h => `<tr>
+    <td>${h.day}</td><td>${h.date}</td>
+    <td class="mono">${fmt$(h.equity)}</td>
+    <td class="${h.ret_pct>=0?'up':'down'} mono">${pct(h.ret_pct)}</td>
+    <td class="mono">${h.positions}</td>
+    <td class="mono">${fmt$(h.cash)}</td>
+  </tr>`).join("");
+});
+</script>
+</body>
+</html>
