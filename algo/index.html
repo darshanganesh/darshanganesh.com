@@ -7,24 +7,24 @@
 <style>
   :root {
     --bg:#0d1117; --card:#161b22; --card-border:#30363d; --text:#e6edf3; --muted:#8b949e;
-    --btc:#58a6ff; --eth:#f0883e; --up:#3fb950; --down:#f85149;
-    --glow-btc: rgba(88,166,255,0.08); --glow-eth: rgba(240,136,62,0.08);
+    --btc:#58a6ff; --eth:#f0883e; --sol:#a371f7; --up:#3fb950; --down:#f85149;
+    --glow-btc: rgba(88,166,255,0.08); --glow-eth: rgba(240,136,62,0.08); --glow-sol: rgba(163,113,247,0.08);
   }
   @media (prefers-color-scheme: light) {
     :root:not([data-theme="dark"]) {
       --bg:#f6f8fa; --card:#ffffff; --card-border:#d0d7de; --text:#1f2328; --muted:#656d76;
-      --btc:#0969da; --eth:#cf222e; --up:#1a7f37; --down:#cf222e;
-      --glow-btc: rgba(9,105,218,0.06); --glow-eth: rgba(207,34,46,0.06);
+      --btc:#0969da; --eth:#bc4c00; --sol:#8250df; --up:#1a7f37; --down:#cf222e;
+      --glow-btc: rgba(9,105,218,0.06); --glow-eth: rgba(188,76,0,0.06); --glow-sol: rgba(130,80,223,0.06);
     }
   }
   :root[data-theme="light"] {
     --bg:#f6f8fa; --card:#ffffff; --card-border:#d0d7de; --text:#1f2328; --muted:#656d76;
-    --btc:#0969da; --eth:#cf222e; --up:#1a7f37; --down:#cf222e;
-    --glow-btc: rgba(9,105,218,0.06); --glow-eth: rgba(207,34,46,0.06);
+    --btc:#0969da; --eth:#bc4c00; --sol:#8250df; --up:#1a7f37; --down:#cf222e;
+    --glow-btc: rgba(9,105,218,0.06); --glow-eth: rgba(188,76,0,0.06); --glow-sol: rgba(130,80,223,0.06);
   }
   * { box-sizing:border-box; margin:0; }
   body { background:var(--bg); color:var(--text); font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,monospace; }
-  main { max-width:820px; margin:0 auto; padding:32px 16px 64px; }
+  main { max-width:900px; margin:0 auto; padding:32px 16px 64px; }
 
   .header { margin-bottom:28px; }
   .header h1 { font-size:24px; font-weight:700; letter-spacing:-0.5px; }
@@ -39,20 +39,21 @@
   .stat .label { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); }
   .stat .value { font-size:26px; font-weight:700; line-height:1.2; }
 
-  .cards { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
-  @media (max-width:600px) { .cards { grid-template-columns:1fr; } }
+  .cards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px; }
+  @media (max-width:780px) { .cards { grid-template-columns:1fr; } }
   .card { background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:20px; position:relative; overflow:hidden; }
   .card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; }
   .card.btc::before { background:var(--btc); }
   .card.eth::before { background:var(--eth); }
+  .card.sol::before { background:var(--sol); }
   .card .coin-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
   .card .coin-name { font-size:14px; font-weight:600; }
   .card .venue { font-size:11px; color:var(--muted); background:var(--card-border); padding:2px 8px; border-radius:10px; }
-  .card .equity { font-size:28px; font-weight:700; letter-spacing:-1px; }
-  .card .ret { font-size:15px; font-weight:600; margin-left:8px; }
+  .card .equity { font-size:24px; font-weight:700; letter-spacing:-1px; }
+  .card .ret { font-size:14px; font-weight:600; margin-left:6px; }
   .card .from { font-size:12px; color:var(--muted); margin:2px 0 14px; }
   .card .rows { border-top:1px solid var(--card-border); }
-  .card .row { display:flex; justify-content:space-between; padding:7px 0; font-size:13px; border-bottom:1px solid var(--card-border); }
+  .card .row { display:flex; justify-content:space-between; padding:6px 0; font-size:12px; border-bottom:1px solid var(--card-border); }
   .card .row:last-child { border-bottom:none; }
   .card .row .k { color:var(--muted); }
   .card .row .v { font-weight:500; font-family:monospace; }
@@ -61,7 +62,7 @@
   .chart-box h2 { font-size:14px; font-weight:600; margin-bottom:4px; }
   .chart-box .chart-sub { font-size:12px; color:var(--muted); margin-bottom:12px; }
   svg { width:100%; height:240px; display:block; }
-  .legend { display:flex; gap:20px; font-size:12px; color:var(--muted); margin-top:10px; }
+  .legend { display:flex; gap:20px; font-size:12px; color:var(--muted); margin-top:10px; flex-wrap:wrap; }
   .legend span { display:flex; align-items:center; gap:5px; }
   .ldot { width:10px; height:3px; border-radius:2px; display:inline-block; }
 
@@ -74,6 +75,7 @@
   .tag { font-size:11px; padding:2px 7px; border-radius:6px; font-weight:600; }
   .tag.long { background:rgba(63,185,80,0.15); color:var(--up); }
   .tag.flat { background:rgba(139,148,158,0.15); color:var(--muted); }
+  .tag.new { background:rgba(163,113,247,0.15); color:var(--sol); }
 
   .rules { background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:20px; }
   .rules h2 { font-size:14px; font-weight:600; margin-bottom:8px; }
@@ -103,16 +105,13 @@
     <h2>Return curve</h2>
     <div class="chart-sub">Daily mark-to-market vs. starting capital</div>
     <svg id="svg" viewBox="0 0 760 240" preserveAspectRatio="none"></svg>
-    <div class="legend">
-      <span><span class="ldot" style="background:var(--btc)"></span> BTC / Alpaca paper</span>
-      <span><span class="ldot" style="background:var(--eth)"></span> ETH / Binance testnet</span>
-    </div>
+    <div class="legend" id="legend"></div>
   </div>
 
   <div class="trades-box">
     <h2>Signal history</h2>
-    <table id="signal-table">
-      <thead><tr><th>Day</th><th>Date</th><th>BTC return</th><th>ETH return</th><th>Status</th></tr></thead>
+    <table>
+      <thead><tr><th>Day</th><th>Date</th><th>BTC</th><th>ETH</th><th>SOL</th><th>Signal</th></tr></thead>
       <tbody id="signal-body"></tbody>
     </table>
   </div>
@@ -124,7 +123,7 @@
       <li><b>Exit:</b> sell to cash when either condition flips</li>
       <li><b>Stop loss:</b> 20% trailing stop from the peak close since entry</li>
       <li><b>Re-entry:</b> after a stop-out, wait for a new signal confirmation</li>
-      <li><b>Allocation:</b> 70% ETH (Binance testnet), 30% BTC (Alpaca paper) by capital</li>
+      <li><b>Allocation:</b> $100k BTC (Alpaca paper) / $10k ETH (Binance testnet) / $4k SOL (Binance testnet, volatile stress-test)</li>
       <li><b>Frequency:</b> checked 5x daily via cron at 05:35, 09:35, 13:35, 17:35, 21:35 IST</li>
     </ul>
   </div>
@@ -139,8 +138,9 @@ fetch("data.json?"+Date.now()).then(r=>r.json()).then(d=>{
   document.getElementById("meta-day").textContent = `Day ${d.day}`;
   document.getElementById("meta-updated").textContent = `Updated ${d.updated}`;
 
-  const totalEquity = d.btc.equity + d.eth.equity;
-  const totalStart = d.btc.start + d.eth.start;
+  const hasSol = !!d.sol;
+  const totalEquity = d.btc.equity + d.eth.equity + (hasSol ? d.sol.equity : 0);
+  const totalStart = d.btc.start + d.eth.start + (hasSol ? d.sol.start : 0);
   const totalRet = (totalEquity / totalStart - 1) * 100;
 
   document.getElementById("summary").innerHTML = `
@@ -161,6 +161,8 @@ fetch("data.json?"+Date.now()).then(r=>r.json()).then(d=>{
     {cls:"btc", name:"Bitcoin", venue:"Alpaca paper", a:d.btc},
     {cls:"eth", name:"Ethereum", venue:"Binance testnet", a:d.eth},
   ];
+  if (hasSol) coins.push({cls:"sol", name:"Solana", venue:"Binance testnet", a:d.sol});
+
   document.getElementById("cards").innerHTML = coins.map(x=>`
     <div class="card ${x.cls}">
       <div class="coin-head">
@@ -184,49 +186,60 @@ fetch("data.json?"+Date.now()).then(r=>r.json()).then(d=>{
 
   // chart
   const h = d.history, W=760, H=240, P={l:48,r:16,t:16,b:30};
-  const ys = h.flatMap(r=>[r.btc_ret,r.eth_ret,0]);
+  const series = [["btc_ret","var(--btc)","var(--glow-btc)"],["eth_ret","var(--eth)","var(--glow-eth)"]];
+  if (hasSol) series.push(["sol_ret","var(--sol)","var(--glow-sol)"]);
+
+  const ys = h.flatMap(r => series.map(s => r[s[0]] || 0)).concat([0]);
   let lo=Math.min(...ys), hi=Math.max(...ys);
   const pad=(hi-lo)*0.2||2; lo-=pad; hi+=pad;
   const X=i=>P.l+(h.length>1?i/(h.length-1):0.5)*(W-P.l-P.r);
   const Y=v=>P.t+(hi-v)/(hi-lo)*(H-P.t-P.b);
   let s="";
 
-  // grid lines
   const ticks=5;
   for(let k=0;k<=ticks;k++){
     const v=lo+(hi-lo)*k/ticks;
     s+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--card-border)" stroke-width="0.5"/>`;
     s+=`<text x="${P.l-8}" y="${Y(v)+4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="monospace">${v.toFixed(1)}%</text>`;
   }
-  // zero line
   if(lo<0 && hi>0) s+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--muted)" stroke-width="0.8" stroke-dasharray="4 3"/>`;
-  // x labels
   h.forEach((r,i)=>{
     s+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="monospace">${r.date.slice(5)}</text>`;
   });
 
-  // area fills
-  for(const [k,col,glow] of [["btc_ret","var(--btc)","var(--glow-btc)"],["eth_ret","var(--eth)","var(--glow-eth)"]]) {
-    const pts = h.map((r,i)=>X(i)+","+Y(r[k])).join(" ");
+  for(const [k,col,glow] of series) {
+    const pts = h.map((r,i)=>X(i)+","+Y(r[k]||0)).join(" ");
     const areaPts = `${X(0)},${Y(0)} ${pts} ${X(h.length-1)},${Y(0)}`;
     s+=`<polygon fill="${glow}" points="${areaPts}"/>`;
     s+=`<polyline fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts}"/>`;
     h.forEach((r,i)=>{
-      s+=`<circle cx="${X(i)}" cy="${Y(r[k])}" r="4" fill="${col}" stroke="var(--card)" stroke-width="2"><title>${r.date}: ${pct(r[k])}</title></circle>`;
+      s+=`<circle cx="${X(i)}" cy="${Y(r[k]||0)}" r="4" fill="${col}" stroke="var(--card)" stroke-width="2"><title>${r.date}: ${pct(r[k]||0)}</title></circle>`;
     });
   }
   document.getElementById("svg").innerHTML = s;
 
+  const legendItems = [
+    {col:"var(--btc)", label:"BTC / Alpaca paper"},
+    {col:"var(--eth)", label:"ETH / Binance testnet"},
+  ];
+  if (hasSol) legendItems.push({col:"var(--sol)", label:"SOL / Binance testnet"});
+  document.getElementById("legend").innerHTML = legendItems.map(l=>
+    `<span><span class="ldot" style="background:${l.col}"></span> ${l.label}</span>`
+  ).join("");
+
   // signal history table
   const tbody = document.getElementById("signal-body");
-  tbody.innerHTML = h.slice().reverse().map(r=>`
-    <tr>
+  tbody.innerHTML = h.slice().reverse().map(r=>{
+    const solVal = r.sol_ret !== undefined ? `<td class="${r.sol_ret>=0?'up':'down'}">${pct(r.sol_ret)}</td>` : `<td style="color:var(--muted)">--</td>`;
+    return `<tr>
       <td>${r.day}</td>
       <td>${r.date}</td>
       <td class="${r.btc_ret>=0?'up':'down'}">${pct(r.btc_ret)}</td>
       <td class="${r.eth_ret>=0?'up':'down'}">${pct(r.eth_ret)}</td>
+      ${solVal}
       <td><span class="tag long">LONG</span></td>
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 
 }).catch(e=>{
   document.getElementById("meta-day").textContent = "No data loaded";
