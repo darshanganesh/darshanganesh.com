@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P&L · Algo Tracker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <span class="nav-title">ALGO TRACKER</span>
+    <div class="nav-links">
+      <a href="index.html">Overview</a>
+      <a href="coins.html">Aggressive Coins</a>
+      <a href="profits.html" class="active">P&L</a>
+    </div>
+  </div>
+</nav>
+<main>
+  <h1>Profit & Loss</h1>
+  <p class="sub" id="meta"></p>
+
+  <div class="grid-3" id="pnl-summary"></div>
+
+  <div class="section">
+    <h2>Aggressive Breakdown by Coin</h2>
+    <table>
+      <thead><tr><th>Coin</th><th>Status</th><th>Unrealized</th><th>Realized</th><th>Net P&L</th><th>Trades</th></tr></thead>
+      <tbody id="pnl-body"></tbody>
+      <tfoot id="pnl-foot"></tfoot>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Capital Allocation</h2>
+    <div id="alloc"></div>
+  </div>
+
+  <div class="section">
+    <h2>Aggressive Daily Returns</h2>
+    <table>
+      <thead><tr><th>Day</th><th>Date</th><th>Equity</th><th>Return</th><th>Positions</th><th>Cash</th></tr></thead>
+      <tbody id="daily-body"></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Defensive Daily Returns</h2>
+    <table>
+      <thead><tr><th>Day</th><th>Date</th><th>BTC</th><th>ETH</th><th>SOL</th></tr></thead>
+      <tbody id="def-daily"></tbody>
+    </table>
+  </div>
+
+  <p class="foot">Paper money only. No real funds. Built by Darshan Ganesh.</p>
+</main>
+<script src="app.js"></script>
+<script>
+loadAll(function(def, d) {
+  document.getElementById("meta").textContent = "Day " + d.day + " · Updated " + d.updated;
+
+  document.getElementById("pnl-summary").innerHTML =
+    '<div class="stat-card"><div class="stat-label">Gross P&L</div><div class="stat-val ' + (d.gross_pnl>=0?'up':'down') + '">' + fmt$(d.gross_pnl,2) + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Realized P&L</div><div class="stat-val ' + (d.realized_pnl>=0?'up':'down') + '">' + fmt$(d.realized_pnl,2) + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Unrealized P&L</div><div class="stat-val ' + (d.unrealized_pnl>=0?'up':'down') + '">' + fmt$(d.unrealized_pnl,2) + '</div></div>';
+
+  var tbody = document.getElementById("pnl-body");
+  var totU=0, totR=0, totT=0;
+  tbody.innerHTML = d.coins.map(function(c) {
+    var net = c.unrealized_pnl + c.realized_pnl;
+    totU += c.unrealized_pnl; totR += c.realized_pnl; totT += c.trades;
+    var statusCls = c.status==="HOLDING"?"tag-hold":c.status==="WATCHING"?"tag-watch":"tag-scan";
+    return '<tr><td><b>' + c.name + '</b></td>' +
+      '<td><span class="tag ' + statusCls + '">' + c.status + '</span></td>' +
+      '<td class="' + (c.unrealized_pnl>=0?'up':'down') + ' mono">' + fmt$(c.unrealized_pnl,2) + '</td>' +
+      '<td class="' + (c.realized_pnl>=0?'up':'down') + ' mono">' + fmt$(c.realized_pnl,2) + '</td>' +
+      '<td class="' + (net>=0?'up':'down') + ' mono"><b>' + fmt$(net,2) + '</b></td>' +
+      '<td class="mono">' + c.trades + '</td></tr>';
+  }).join("");
+  var totNet = totU + totR;
+  document.getElementById("pnl-foot").innerHTML = '<tr style="border-top:2px solid var(--border)">' +
+    '<td colspan="2"><b>TOTAL</b></td>' +
+    '<td class="' + (totU>=0?'up':'down') + ' mono"><b>' + fmt$(totU,2) + '</b></td>' +
+    '<td class="' + (totR>=0?'up':'down') + ' mono"><b>' + fmt$(totR,2) + '</b></td>' +
+    '<td class="' + (totNet>=0?'up':'down') + ' mono"><b>' + fmt$(totNet,2) + '</b></td>' +
+    '<td class="mono"><b>' + totT + '</b></td></tr>';
+
+  // Allocation bar
+  var invested = d.coins.reduce(function(a,c){return a+c.value},0);
+  var total = d.cash + invested;
+  var colors = {SOL:"#a371f7",AVAX:"#f85149",LINK:"#58a6ff",DOT:"#f0883e",DOGE:"#d2a8ff"};
+  var html = '<div class="alloc-bar">';
+  d.coins.forEach(function(c) {
+    if (c.value > 0) {
+      var w = (c.value / total * 100).toFixed(1);
+      html += '<div class="alloc-seg" style="width:' + w + '%;background:' + (colors[c.name]||'#58a6ff') + '" title="' + c.name + ': ' + w + '%"></div>';
+    }
+  });
+  var cashW = (d.cash / total * 100).toFixed(1);
+  html += '<div class="alloc-seg alloc-cash" style="width:' + cashW + '%" title="Cash: ' + cashW + '%"></div>';
+  html += '</div><div class="alloc-legend">';
+  d.coins.forEach(function(c) {
+    if (c.value > 0) html += '<span><span class="ldot" style="background:' + (colors[c.name]||'#58a6ff') + ';width:10px;height:10px;border-radius:50%"></span>' + c.name + ' ' + (c.value/total*100).toFixed(1) + '%</span>';
+  });
+  html += '<span><span class="ldot" style="background:var(--muted);width:10px;height:10px;border-radius:50%"></span>Cash ' + cashW + '%</span></div>';
+  document.getElementById("alloc").innerHTML = html;
+
+  // Aggressive daily
+  document.getElementById("daily-body").innerHTML = d.history.slice().reverse().map(function(h) {
+    return '<tr><td>' + h.day + '</td><td>' + h.date + '</td>' +
+      '<td class="mono">' + fmt$(h.equity) + '</td>' +
+      '<td class="' + (h.ret_pct>=0?'up':'down') + ' mono">' + pct(h.ret_pct) + '</td>' +
+      '<td class="mono">' + h.positions + '</td>' +
+      '<td class="mono">' + fmt$(h.cash) + '</td></tr>';
+  }).join("");
+
+  // Defensive daily
+  document.getElementById("def-daily").innerHTML = def.history.slice().reverse().map(function(r) {
+    var solVal = r.sol_ret !== undefined ? '<td class="' + (r.sol_ret>=0?'up':'down') + '">' + pct(r.sol_ret) + '</td>' : '<td style="color:var(--muted)">--</td>';
+    return '<tr><td>' + r.day + '</td><td>' + r.date + '</td>' +
+      '<td class="' + (r.btc_ret>=0?'up':'down') + '">' + pct(r.btc_ret) + '</td>' +
+      '<td class="' + (r.eth_ret>=0?'up':'down') + '">' + pct(r.eth_ret) + '</td>' +
+      solVal + '</tr>';
+  }).join("");
+});
+</script>
+</body>
+</html>

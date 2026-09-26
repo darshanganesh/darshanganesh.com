@@ -4,246 +4,172 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Algo Tracker</title>
-<style>
-  :root {
-    --bg:#0d1117; --card:#161b22; --card-border:#30363d; --text:#e6edf3; --muted:#8b949e;
-    --btc:#58a6ff; --eth:#f0883e; --sol:#a371f7; --up:#3fb950; --down:#f85149;
-    --glow-btc: rgba(88,166,255,0.08); --glow-eth: rgba(240,136,62,0.08); --glow-sol: rgba(163,113,247,0.08);
-  }
-  @media (prefers-color-scheme: light) {
-    :root:not([data-theme="dark"]) {
-      --bg:#f6f8fa; --card:#ffffff; --card-border:#d0d7de; --text:#1f2328; --muted:#656d76;
-      --btc:#0969da; --eth:#bc4c00; --sol:#8250df; --up:#1a7f37; --down:#cf222e;
-      --glow-btc: rgba(9,105,218,0.06); --glow-eth: rgba(188,76,0,0.06); --glow-sol: rgba(130,80,223,0.06);
-    }
-  }
-  :root[data-theme="light"] {
-    --bg:#f6f8fa; --card:#ffffff; --card-border:#d0d7de; --text:#1f2328; --muted:#656d76;
-    --btc:#0969da; --eth:#bc4c00; --sol:#8250df; --up:#1a7f37; --down:#cf222e;
-    --glow-btc: rgba(9,105,218,0.06); --glow-eth: rgba(188,76,0,0.06); --glow-sol: rgba(130,80,223,0.06);
-  }
-  * { box-sizing:border-box; margin:0; }
-  body { background:var(--bg); color:var(--text); font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,monospace; }
-  main { max-width:900px; margin:0 auto; padding:32px 16px 64px; }
-
-  .header { margin-bottom:28px; }
-  .header h1 { font-size:24px; font-weight:700; letter-spacing:-0.5px; }
-  .header .meta { color:var(--muted); font-size:13px; margin-top:2px; display:flex; gap:16px; flex-wrap:wrap; }
-  .header .meta .live { color:var(--up); }
-  .header .meta .live::before { content:""; display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--up); margin-right:5px; animation:pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-  .summary { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:20px; }
-  @media (max-width:600px) { .summary { grid-template-columns:1fr; } }
-  .stat { background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:14px 16px; }
-  .stat .label { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); }
-  .stat .value { font-size:26px; font-weight:700; line-height:1.2; }
-
-  .cards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px; }
-  @media (max-width:780px) { .cards { grid-template-columns:1fr; } }
-  .card { background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:20px; position:relative; overflow:hidden; }
-  .card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; }
-  .card.btc::before { background:var(--btc); }
-  .card.eth::before { background:var(--eth); }
-  .card.sol::before { background:var(--sol); }
-  .card .coin-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-  .card .coin-name { font-size:14px; font-weight:600; }
-  .card .venue { font-size:11px; color:var(--muted); background:var(--card-border); padding:2px 8px; border-radius:10px; }
-  .card .equity { font-size:24px; font-weight:700; letter-spacing:-1px; }
-  .card .ret { font-size:14px; font-weight:600; margin-left:6px; }
-  .card .from { font-size:12px; color:var(--muted); margin:2px 0 14px; }
-  .card .rows { border-top:1px solid var(--card-border); }
-  .card .row { display:flex; justify-content:space-between; padding:6px 0; font-size:12px; border-bottom:1px solid var(--card-border); }
-  .card .row:last-child { border-bottom:none; }
-  .card .row .k { color:var(--muted); }
-  .card .row .v { font-weight:500; font-family:monospace; }
-
-  .chart-box { background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:20px; margin-bottom:20px; }
-  .chart-box h2 { font-size:14px; font-weight:600; margin-bottom:4px; }
-  .chart-box .chart-sub { font-size:12px; color:var(--muted); margin-bottom:12px; }
-  svg { width:100%; height:240px; display:block; }
-  .legend { display:flex; gap:20px; font-size:12px; color:var(--muted); margin-top:10px; flex-wrap:wrap; }
-  .legend span { display:flex; align-items:center; gap:5px; }
-  .ldot { width:10px; height:3px; border-radius:2px; display:inline-block; }
-
-  .trades-box { background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:20px; margin-bottom:20px; }
-  .trades-box h2 { font-size:14px; font-weight:600; margin-bottom:12px; }
-  table { width:100%; border-collapse:collapse; font-size:13px; }
-  th { text-align:left; color:var(--muted); font-weight:500; padding:6px 8px; border-bottom:1px solid var(--card-border); font-size:11px; text-transform:uppercase; letter-spacing:0.3px; }
-  td { padding:7px 8px; border-bottom:1px solid var(--card-border); font-family:monospace; }
-  tr:last-child td { border-bottom:none; }
-  .tag { font-size:11px; padding:2px 7px; border-radius:6px; font-weight:600; }
-  .tag.long { background:rgba(63,185,80,0.15); color:var(--up); }
-  .tag.flat { background:rgba(139,148,158,0.15); color:var(--muted); }
-  .tag.new { background:rgba(163,113,247,0.15); color:var(--sol); }
-
-  .rules { background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:20px; }
-  .rules h2 { font-size:14px; font-weight:600; margin-bottom:8px; }
-  .rules ul { padding-left:18px; font-size:13px; color:var(--muted); }
-  .rules li { margin-bottom:4px; }
-  .rules code { background:var(--card-border); padding:1px 5px; border-radius:4px; font-size:12px; color:var(--text); }
-
-  .up { color:var(--up); } .down { color:var(--down); }
-  .foot { color:var(--muted); font-size:12px; margin-top:24px; text-align:center; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main>
-  <div class="header">
-    <h1>Algo Tracker</h1>
-    <div class="meta">
-      <span class="live">Running</span>
-      <span id="meta-day"></span>
-      <span id="meta-updated"></span>
+<nav>
+  <div class="nav-inner">
+    <span class="nav-title">ALGO TRACKER</span>
+    <div class="nav-links">
+      <a href="index.html" class="active">Overview</a>
+      <a href="coins.html">Aggressive Coins</a>
+      <a href="profits.html">P&L</a>
     </div>
   </div>
+</nav>
+<main>
+  <div class="hero" id="hero"></div>
+  <div class="grid-4" id="top-stats"></div>
 
-  <div class="summary" id="summary"></div>
-  <div class="cards" id="cards"></div>
-
-  <div class="chart-box">
-    <h2>Return curve</h2>
-    <div class="chart-sub">Daily mark-to-market vs. starting capital</div>
-    <svg id="svg" viewBox="0 0 760 240" preserveAspectRatio="none"></svg>
-    <div class="legend" id="legend"></div>
+  <!-- DEFENSIVE -->
+  <div class="strat-section">
+    <div class="strat-title"><span class="strat-badge def">DEFENSIVE</span> BTC · ETH · SOL</div>
+    <p class="sub">EMA crossover + momentum. 20% trailing stop. Hold or cash.</p>
+  </div>
+  <div class="grid-3" id="def-cards"></div>
+  <div class="section chart-box">
+    <h2>Defensive Returns</h2>
+    <div class="chart-sub">Daily return vs starting capital</div>
+    <svg id="def-chart" viewBox="0 0 760 200" preserveAspectRatio="none"></svg>
+    <div class="legend" id="def-legend"></div>
   </div>
 
-  <div class="trades-box">
-    <h2>Signal history</h2>
+  <!-- AGGRESSIVE -->
+  <div class="strat-section">
+    <div class="strat-title"><span class="strat-badge agg">AGGRESSIVE</span> Conviction Scanner</div>
+    <p class="sub">Signal stacking (0-100). Watch at 45, enter after 20 days if ≥55. 8% trailing stop.</p>
+  </div>
+  <div class="grid-3" id="agg-stats"></div>
+  <div class="section">
+    <table>
+      <thead><tr><th>Coin</th><th>Price</th><th>Score</th><th>RSI</th><th>BB Width</th><th>Squeeze</th><th>EMA Stack</th><th>Status</th></tr></thead>
+      <tbody id="scanner-body"></tbody>
+    </table>
+  </div>
+  <div class="section chart-box">
+    <h2>Aggressive Equity</h2>
+    <svg id="agg-chart" viewBox="0 0 760 200" preserveAspectRatio="none"></svg>
+  </div>
+
+  <!-- SIGNAL HISTORY -->
+  <div class="section">
+    <h2>Defensive Signal History</h2>
     <table>
       <thead><tr><th>Day</th><th>Date</th><th>BTC</th><th>ETH</th><th>SOL</th><th>Signal</th></tr></thead>
       <tbody id="signal-body"></tbody>
     </table>
   </div>
 
-  <div class="rules">
-    <h2>Strategy rules</h2>
-    <ul>
-      <li><b>Entry:</b> go long when <code>EMA(12) &gt; EMA(26)</code> and average of 42/84/126-day momentum is positive</li>
-      <li><b>Exit:</b> sell to cash when either condition flips</li>
-      <li><b>Stop loss:</b> 20% trailing stop from the peak close since entry</li>
-      <li><b>Re-entry:</b> after a stop-out, wait for a new signal confirmation</li>
-      <li><b>Allocation:</b> $100k BTC (Alpaca paper) / $10k ETH (Binance testnet) / $4k SOL (Binance testnet, volatile stress-test)</li>
-      <li><b>Frequency:</b> checked 5x daily via cron at 05:35, 09:35, 13:35, 17:35, 21:35 IST</li>
-    </ul>
+  <!-- RULES -->
+  <div class="section grid-2">
+    <div class="rules">
+      <h2>Defensive Rules</h2>
+      <ul>
+        <li><b>Entry:</b> <code>EMA(12) &gt; EMA(26)</code> + positive momentum</li>
+        <li><b>Exit:</b> when either condition flips</li>
+        <li><b>Stop:</b> 20% trailing from peak</li>
+        <li><b>Allocation:</b> $100k BTC / $10k ETH / $4k SOL</li>
+      </ul>
+    </div>
+    <div class="rules">
+      <h2>Aggressive Rules</h2>
+      <ul>
+        <li><b>Signals:</b> EMA, BB, RSI, volume, momentum → conviction 0-100</li>
+        <li><b>Watch:</b> score crosses 45, wait 20 days</li>
+        <li><b>Entry:</b> if score ≥55 after 20 days</li>
+        <li><b>Risk:</b> 8% trail stop, 30% profit take at +10%</li>
+        <li><b>Sizing:</b> 15-30% capital per coin by conviction</li>
+      </ul>
+    </div>
   </div>
 
-  <p class="foot">Paper money only. No real funds at risk. Built by Darshan Ganesh.</p>
+  <p class="foot">Paper money only. No real funds. Built by Darshan Ganesh.</p>
 </main>
+<script src="app.js"></script>
 <script>
-const fmt$ = (n,d=0) => "$"+n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
-const pct = n => (n>=0?"+":"")+n.toFixed(2)+"%";
+loadAll(function(d, a) {
+  var hasSol = !!d.sol;
+  var defEquity = d.btc.equity + d.eth.equity + (hasSol ? d.sol.equity : 0);
+  var defStart = d.btc.start + d.eth.start + (hasSol ? d.sol.start : 0);
+  var totalEquity = defEquity + a.equity;
+  var totalStart = defStart + a.start;
+  var totalRet = (totalEquity / totalStart - 1) * 100;
 
-fetch("data.json?"+Date.now()).then(r=>r.json()).then(d=>{
-  document.getElementById("meta-day").textContent = `Day ${d.day}`;
-  document.getElementById("meta-updated").textContent = `Updated ${d.updated}`;
+  document.getElementById("hero").innerHTML =
+    '<div class="hero-equity">' + fmt$(totalEquity) + '</div>' +
+    '<div class="hero-ret ' + (totalRet >= 0 ? 'up' : 'down') + '">' + pct(totalRet) + ' combined</div>' +
+    '<div class="hero-meta">Day ' + d.day + ' · Updated ' + d.updated + '</div>';
 
-  const hasSol = !!d.sol;
-  const totalEquity = d.btc.equity + d.eth.equity + (hasSol ? d.sol.equity : 0);
-  const totalStart = d.btc.start + d.eth.start + (hasSol ? d.sol.start : 0);
-  const totalRet = (totalEquity / totalStart - 1) * 100;
+  document.getElementById("top-stats").innerHTML =
+    '<div class="stat-card"><div class="stat-label">Defensive Equity</div><div class="stat-val">' + fmt$(defEquity) + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Aggressive Equity</div><div class="stat-val">' + fmt$(a.equity) + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Aggressive Cash</div><div class="stat-val">' + fmt$(a.cash) + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Days Running</div><div class="stat-val">' + d.day + '</div></div>';
 
-  document.getElementById("summary").innerHTML = `
-    <div class="stat">
-      <div class="label">Combined equity</div>
-      <div class="value">${fmt$(totalEquity)}</div>
-    </div>
-    <div class="stat">
-      <div class="label">Combined return</div>
-      <div class="value ${totalRet>=0?'up':'down'}">${pct(totalRet)}</div>
-    </div>
-    <div class="stat">
-      <div class="label">Days running</div>
-      <div class="value">${d.day}</div>
-    </div>`;
-
-  const coins = [
-    {cls:"btc", name:"Bitcoin", venue:"Alpaca paper", a:d.btc},
-    {cls:"eth", name:"Ethereum", venue:"Binance testnet", a:d.eth},
+  // Defensive cards
+  var coins = [
+    {cls:"btc", name:"Bitcoin", venue:"Alpaca paper", x:d.btc},
+    {cls:"eth", name:"Ethereum", venue:"Binance testnet", x:d.eth}
   ];
-  if (hasSol) coins.push({cls:"sol", name:"Solana", venue:"Binance testnet", a:d.sol});
-
-  document.getElementById("cards").innerHTML = coins.map(x=>`
-    <div class="card ${x.cls}">
-      <div class="coin-head">
-        <span class="coin-name">${x.name}</span>
-        <span class="venue">${x.venue}</span>
-      </div>
-      <div>
-        <span class="equity">${fmt$(x.a.equity)}</span>
-        <span class="ret ${x.a.ret_pct>=0?'up':'down'}">${pct(x.a.ret_pct)}</span>
-      </div>
-      <div class="from">from ${fmt$(x.a.start)}</div>
-      <div class="rows">
-        <div class="row"><span class="k">Position</span><span class="v">${x.a.position}</span></div>
-        <div class="row"><span class="k">Entry price</span><span class="v">${fmt$(x.a.entry,2)}</span></div>
-        <div class="row"><span class="k">Current price</span><span class="v">${fmt$(x.a.price,2)}</span></div>
-        <div class="row"><span class="k">Signal</span><span class="v"><span class="tag ${x.a.signal==='LONG'?'long':'flat'}">${x.a.signal}</span></span></div>
-        <div class="row"><span class="k">Trailing stop</span><span class="v">${fmt$(x.a.stop,0)}</span></div>
-        <div class="row"><span class="k">Trades</span><span class="v">${x.a.trades}</span></div>
-      </div>
-    </div>`).join("");
-
-  // chart
-  const h = d.history, W=760, H=240, P={l:48,r:16,t:16,b:30};
-  const series = [["btc_ret","var(--btc)","var(--glow-btc)"],["eth_ret","var(--eth)","var(--glow-eth)"]];
-  if (hasSol) series.push(["sol_ret","var(--sol)","var(--glow-sol)"]);
-
-  const ys = h.flatMap(r => series.map(s => r[s[0]] || 0)).concat([0]);
-  let lo=Math.min(...ys), hi=Math.max(...ys);
-  const pad=(hi-lo)*0.2||2; lo-=pad; hi+=pad;
-  const X=i=>P.l+(h.length>1?i/(h.length-1):0.5)*(W-P.l-P.r);
-  const Y=v=>P.t+(hi-v)/(hi-lo)*(H-P.t-P.b);
-  let s="";
-
-  const ticks=5;
-  for(let k=0;k<=ticks;k++){
-    const v=lo+(hi-lo)*k/ticks;
-    s+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--card-border)" stroke-width="0.5"/>`;
-    s+=`<text x="${P.l-8}" y="${Y(v)+4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="monospace">${v.toFixed(1)}%</text>`;
-  }
-  if(lo<0 && hi>0) s+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--muted)" stroke-width="0.8" stroke-dasharray="4 3"/>`;
-  h.forEach((r,i)=>{
-    s+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="monospace">${r.date.slice(5)}</text>`;
-  });
-
-  for(const [k,col,glow] of series) {
-    const pts = h.map((r,i)=>X(i)+","+Y(r[k]||0)).join(" ");
-    const areaPts = `${X(0)},${Y(0)} ${pts} ${X(h.length-1)},${Y(0)}`;
-    s+=`<polygon fill="${glow}" points="${areaPts}"/>`;
-    s+=`<polyline fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts}"/>`;
-    h.forEach((r,i)=>{
-      s+=`<circle cx="${X(i)}" cy="${Y(r[k]||0)}" r="4" fill="${col}" stroke="var(--card)" stroke-width="2"><title>${r.date}: ${pct(r[k]||0)}</title></circle>`;
-    });
-  }
-  document.getElementById("svg").innerHTML = s;
-
-  const legendItems = [
-    {col:"var(--btc)", label:"BTC / Alpaca paper"},
-    {col:"var(--eth)", label:"ETH / Binance testnet"},
-  ];
-  if (hasSol) legendItems.push({col:"var(--sol)", label:"SOL / Binance testnet"});
-  document.getElementById("legend").innerHTML = legendItems.map(l=>
-    `<span><span class="ldot" style="background:${l.col}"></span> ${l.label}</span>`
-  ).join("");
-
-  // signal history table
-  const tbody = document.getElementById("signal-body");
-  tbody.innerHTML = h.slice().reverse().map(r=>{
-    const solVal = r.sol_ret !== undefined ? `<td class="${r.sol_ret>=0?'up':'down'}">${pct(r.sol_ret)}</td>` : `<td style="color:var(--muted)">--</td>`;
-    return `<tr>
-      <td>${r.day}</td>
-      <td>${r.date}</td>
-      <td class="${r.btc_ret>=0?'up':'down'}">${pct(r.btc_ret)}</td>
-      <td class="${r.eth_ret>=0?'up':'down'}">${pct(r.eth_ret)}</td>
-      ${solVal}
-      <td><span class="tag long">LONG</span></td>
-    </tr>`;
+  if (hasSol) coins.push({cls:"sol", name:"Solana", venue:"Binance testnet", x:d.sol});
+  document.getElementById("def-cards").innerHTML = coins.map(function(c) {
+    return '<div class="card ' + c.cls + '">' +
+      '<div class="coin-head"><span class="coin-name">' + c.name + '</span><span class="venue">' + c.venue + '</span></div>' +
+      '<div><span class="equity">' + fmt$(c.x.equity) + '</span><span class="ret ' + (c.x.ret_pct >= 0 ? 'up' : 'down') + '">' + pct(c.x.ret_pct) + '</span></div>' +
+      '<div class="from">from ' + fmt$(c.x.start) + '</div>' +
+      '<div class="rows">' +
+        '<div class="row"><span class="k">Position</span><span class="v">' + c.x.position + '</span></div>' +
+        '<div class="row"><span class="k">Entry</span><span class="v">' + fmt$(c.x.entry, 2) + '</span></div>' +
+        '<div class="row"><span class="k">Price</span><span class="v">' + fmt$(c.x.price, 2) + '</span></div>' +
+        '<div class="row"><span class="k">Signal</span><span class="v"><span class="tag tag-' + c.x.signal.toLowerCase() + '">' + c.x.signal + '</span></span></div>' +
+        '<div class="row"><span class="k">Trail stop</span><span class="v">' + fmt$(c.x.stop, 0) + '</span></div>' +
+        '<div class="row"><span class="k">Trades</span><span class="v">' + c.x.trades + '</span></div>' +
+      '</div></div>';
   }).join("");
 
-}).catch(e=>{
-  document.getElementById("meta-day").textContent = "No data loaded";
-  console.error(e);
+  // Defensive chart
+  var defSeries = [["btc_ret","var(--btc)","rgba(88,166,255,.08)"],["eth_ret","var(--eth)","rgba(240,136,62,.08)"]];
+  if (hasSol) defSeries.push(["sol_ret","var(--sol)","rgba(163,113,247,.08)"]);
+  drawChart(d.history, "def-chart", defSeries);
+  var legendItems = [{c:"var(--btc)",l:"BTC"},{c:"var(--eth)",l:"ETH"}];
+  if (hasSol) legendItems.push({c:"var(--sol)",l:"SOL"});
+  document.getElementById("def-legend").innerHTML = legendItems.map(function(x) {
+    return '<span><span class="ldot" style="background:' + x.c + '"></span>' + x.l + '</span>';
+  }).join("");
+
+  // Aggressive scanner
+  document.getElementById("agg-stats").innerHTML =
+    '<div class="stat-card"><div class="stat-label">Positions Open</div><div class="stat-val">' + a.coins.filter(function(c){return c.coin_held>0}).length + ' / ' + a.coins.length + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Unrealized P&L</div><div class="stat-val ' + (a.unrealized_pnl >= 0 ? 'up' : 'down') + '">' + fmt$(a.unrealized_pnl, 2) + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Total Trades</div><div class="stat-val">' + a.coins.reduce(function(s,c){return s+c.trades},0) + '</div></div>';
+
+  document.getElementById("scanner-body").innerHTML = a.coins.map(function(c) {
+    var bar = '<div class="score-bar"><div class="score-fill" style="width:' + c.conviction + '%;background:' + scoreColor(c.conviction) + '"></div></div>';
+    var statusCls = c.status === "HOLDING" ? "tag-hold" : c.status === "WATCHING" ? "tag-watch" : "tag-scan";
+    var watchInfo = c.status === "WATCHING" ? " D" + c.days_watched + "/20" : "";
+    return '<tr>' +
+      '<td><b>' + c.name + '</b></td>' +
+      '<td>' + fmt$(c.price, c.price < 1 ? 5 : 2) + '</td>' +
+      '<td>' + bar + '<span class="mono">' + c.conviction + '</span></td>' +
+      '<td class="mono">' + c.rsi.toFixed(0) + '</td>' +
+      '<td class="mono">' + c.bb_bandwidth + '%</td>' +
+      '<td>' + (c.squeeze ? '<span class="tag-squeeze">SQUEEZE</span>' : '--') + '</td>' +
+      '<td>' + (c.ema_aligned ? '<span class="tag-ema">ALIGNED</span>' : '--') + '</td>' +
+      '<td><span class="tag ' + statusCls + '">' + c.status + watchInfo + '</span></td></tr>';
+  }).join("");
+
+  // Aggressive equity curve
+  drawEquityCurve(a.history, "agg-chart");
+
+  // Signal history
+  document.getElementById("signal-body").innerHTML = d.history.slice().reverse().map(function(r) {
+    var solVal = r.sol_ret !== undefined ? '<td class="' + (r.sol_ret >= 0 ? 'up' : 'down') + '">' + pct(r.sol_ret) + '</td>' : '<td style="color:var(--muted)">--</td>';
+    return '<tr><td>' + r.day + '</td><td>' + r.date + '</td>' +
+      '<td class="' + (r.btc_ret >= 0 ? 'up' : 'down') + '">' + pct(r.btc_ret) + '</td>' +
+      '<td class="' + (r.eth_ret >= 0 ? 'up' : 'down') + '">' + pct(r.eth_ret) + '</td>' +
+      solVal +
+      '<td><span class="tag tag-long">LONG</span></td></tr>';
+  }).join("");
 });
 </script>
 </body>
