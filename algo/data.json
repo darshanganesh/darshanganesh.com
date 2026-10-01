@@ -1,35 +1,35 @@
 {
- "day": 4,
- "updated": "Sep 26, 18:17 IST",
+ "day": 9,
+ "updated": "Oct 01, 07:21 IST",
  "btc": {
   "start": 100000.0,
-  "equity": 97673.54,
-  "ret_pct": -2.326460000000008,
+  "equity": 97425.07,
+  "ret_pct": -2.5749299999999975,
   "position": "1.1152 BTC",
   "entry": 86005.380848642,
-  "price": 84134.7,
+  "price": 83911.9,
   "signal": "LONG",
   "stop": 69282.33125,
   "trades": 1
  },
  "eth": {
   "start": 10000.0,
-  "equity": 92314.514958,
-  "ret_pct": 823.14514958,
+  "equity": 9822.349344,
+  "ret_pct": -1.7765065600000018,
   "position": "3.5746 ETH",
   "entry": 2741.19,
-  "price": 2688.57,
+  "price": 2691.83,
   "signal": "LONG",
   "stop": 2221.1746093750003,
   "trades": 1
  },
  "sol": {
   "start": 4000.0,
-  "equity": 4021.5008199999997,
-  "ret_pct": 0.5375204999999994,
+  "equity": 4048.21396,
+  "ret_pct": 1.205349,
   "position": "32.5770 SOL",
   "entry": 122.0097427368164,
-  "price": 120.99,
+  "price": 121.81,
   "signal": "LONG",
   "stop": 97.60779418945313,
   "trades": 1
@@ -59,9 +59,16 @@
   {
    "day": 4,
    "date": "2026-09-26",
-   "btc_ret": -2.326,
-   "eth_ret": 823.145,
-   "sol_ret": 0.538
+   "btc_ret": -2.322,
+   "eth_ret": 823.262,
+   "sol_ret": 1.205
+  },
+  {
+   "day": 9,
+   "date": "2026-10-01",
+   "btc_ret": -2.575,
+   "eth_ret": -1.777,
+   "sol_ret": 1.205
   }
  ]
 }
